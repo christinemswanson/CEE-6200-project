@@ -1,5 +1,13 @@
 # CEE-6200-project
-This repository houses my final project for CEE-6200 to perform a model diagnostic assessment of the Plan 2014 simulation model. 
+This repository houses my final project for CEE-6200 to perform a model diagnostic assessment of the Plan 2014 simulation model. The goal of phase I of the project is to determine how well the simulated and observed water levels correspond to each other, particularly during January - May 2017 when the International Lake Ontario St. Lawrence River Borad (ILOSLRB) was not making major deviations from Plan 2014. 
+
+Please note, you will need to change the file path directories to run the R and Python scripts on your local machine, described below. 
+
+**Requirements:**
+
+* To run the R scripts: rnoaa (v = 1.3.4), remotes, tidyverse
+
+* to run the Python scripts: pandas, os
 
 **Repository overview:**
 
