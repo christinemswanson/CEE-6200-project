@@ -3,8 +3,6 @@
 # Load data script for CEE-6200 final project
 # py-script project
 
-# THIS IS A TEST
-
 # This script loads in data for my final project for CEE-6200
 # the relevant data is observed water levels at Lake Ontario and 
 # several locations along the SLR
@@ -81,7 +79,6 @@ LO_historic_wtlvl = LO_historic_wtlvl.iloc[0:1236,:]
 
 ogdensburg_historic_daily_wtlvl = ogdensburg_historic_daily_wtlvl.rename(columns = {"t":"date", "v":"wt_lvl__m", "f":"data_flag"})
 
-
 # Alexandria Bay df cleaned 
 # --------------------------------------------------------------------------
 
@@ -106,3 +103,16 @@ pointClaire_historic_daily_wtlvl['month'] = pointClaire_historic_daily_wtlvl['MO
 
 # sort the pointe claire water level df by month, year, and day
 pointClaire_historic_daily_wtlvl = pointClaire_historic_daily_wtlvl.sort_values(["YEAR", "month", "DD"])
+
+# --------------------------------------------------------------------------
+# Save the LO and SLR water level data to CSV files, load in another script to 
+# perform the analysis
+# save to where the GitHub repo is cloned 
+
+pointClaire_historic_daily_wtlvl.to_csv("C:/Users/cms549/Desktop/GitHub/CEE-6200-project/finalProject/data/historic/cleaned/pointClaire_wtlvl_cleaned.csv")
+
+abay_historic_daily_wtlvl.to_csv("C:/Users/cms549/Desktop/GitHub/CEE-6200-project/finalProject/data/historic/cleaned/abay_wtlvl_cleaned.csv")
+
+ogdensburg_historic_daily_wtlvl.to_csv("C:/Users/cms549/Desktop/GitHub/CEE-6200-project/finalProject/data/historic/cleaned/ogdensburg_wtlvl_cleaned.csv")
+
+LO_historic_wtlvl.to_csv("C:/Users/cms549/Desktop/GitHub/CEE-6200-project/finalProject/data/historic/cleaned/LO_wtlvl_cleaned.csv")
