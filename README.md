@@ -10,7 +10,7 @@ This repository houses my final project for CEE-6200 to perform a model diagnost
 
 1: data
 
-* Contains the historical data on water levels and flows on Lake Ontario and various locations along the St. Lawrence River (Alexandria Bay, Ogdensburg, and Pointe Claire) in the "historic" folder. Contains the Plan 2014 simulation model output, which simulates water levels and flows. 
+* Contains the historical data on water levels and flows on Lake Ontario and various locations along the St. Lawrence River (Alexandria Bay, Ogdensburg, and Pointe Claire) in the "historic" folder. Contains the Plan 2014 simulation model output, which simulates water levels and flows, in the "simulation_output" folder. The simulation output is from this respository: https://github/ksemmendinger/Plan-2014-Python. 
 
 2: documentation
 
