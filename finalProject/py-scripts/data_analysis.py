@@ -4,8 +4,8 @@ Created on Wed Mar 27 12:27:53 2024
 
 @author: cms549 (CM Swanson)
 
-This script compares the observed and simulate
-Lake Ontario and SLR water level data during Jan - May 2017
+This script compares the observed and simulated Lake Ontario and 
+SLR water level data during Jan - May 2017 [Phase I of Project]
 """
 
 # load libraries
@@ -21,6 +21,10 @@ os.chdir(wd)
 # load LO and SLR cleaned historical water level data, processed in "load_data" script
 LO_historic_wtlvl = pd.read_csv("./data/historic/cleaned/LO_wtlvl_cleaned.csv")
 LO_historic_wtlvl = LO_historic_wtlvl.iloc[:, 1:5] # remove repeated index column
+
+# add YY-MM column
+LO_historic_wtlvl["Date"] = pd.to_datetime(LO_historic_wtlvl[["Year", "month"]].assign(DAY=1)) # note,
+# days are meaningless here: the unit of observation is only YY-MM, not day
 
 # Alexandria Bay
 abay_historic_wtlvl = pd.read_csv("./data/historic/cleaned/abay_wtlvl_cleaned.csv")
@@ -39,5 +43,14 @@ pointeClaire_historic_wtlvl = pointeClaire_historic_wtlvl.iloc[:, 1:9]
 LO_simulated_data = pd.read_table("./data/simulation_output/S1.txt")
 
 # Visualize the observed and simulated data as a sanity check for data QAQC
+
+LO_historic_fig = plt.figure()
+plt.plot(LO_historic_wtlvl["Date"], LO_historic_wtlvl["wt_lvl__m"], c = "k")
+plt.scatter(LO_historic_wtlvl["Date"], LO_historic_wtlvl["wt_lvl__m"], s = 1, c="k")
+plt.ylabel("Water levels (m)")
+LO_historic_fig.suptitle("Lake Ontario Historical Monthly Average Water Levels (1918 - 2020)")
+plt.title("Datum: IGLD 1985", loc = "left", fontsize = 10)
+
+LO_historic_fig.savefig("./figs/LO_historic_fig.png", dpi = 400)
 
 
