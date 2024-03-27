@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+from datetime import datetime
 
 # set wd
 wd = "C:/Users/cms549/Desktop/GitHub/CEE-6200-project/finalProject" 
@@ -33,6 +34,8 @@ LO_historic_wtlvl["Date"] = pd.to_datetime(LO_historic_wtlvl[["Year", "month"]].
 # Alexandria Bay
 abay_historic_wtlvl = pd.read_csv("./data/historic/cleaned/abay_wtlvl_cleaned.csv")
 abay_historic_wtlvl = abay_historic_wtlvl.iloc[:, 1:4] # remove repeated index colum
+abay_dates = [date[:10] for date in abay_historic_wtlvl["date"]] # extract YY-MM-DD from "date"
+abay_historic_wtlvl["dates"] = abay_dates # append the new dates column for plotting 
 
 # Ogdensburg
 ogdensburg_historic_wtlvl = pd.read_csv("./data/historic/cleaned/ogdensburg_wtlvl_cleaned.csv")
@@ -56,7 +59,7 @@ LO_simulated_data["Date"] = pd.to_datetime(LO_simulated_data[["Year", "Month"]].
 
 # Visualize the observed and simulated data as a sanity check for data QAQC
 
-# LO historic
+# LO historic [1918 - 2020]
 LO_historic_fig = plt.figure()
 plt.plot(LO_historic_wtlvl["Date"], LO_historic_wtlvl["wt_lvl__m"], c = "k")
 plt.scatter(LO_historic_wtlvl["Date"], LO_historic_wtlvl["wt_lvl__m"], s = 1, c="k")
@@ -67,7 +70,7 @@ plt.ylim(73.5, 76.0)
 
 LO_historic_fig.savefig("./figs/LO_historic_fig.png", dpi = 400)
 
-# LO simulated
+# LO simulated [1900 - 2020]
 LO_simulated_fig = plt.figure()
 plt.plot(LO_simulated_data["Date"], LO_simulated_data["ontLevel"], c = "k")
 #plt.scatter(LO_simulated_data["Date"], LO_simulated_data["ontLevel"], s = 1, c="k")
@@ -77,6 +80,22 @@ LO_simulated_fig.suptitle("Lake Ontario Simulated Monthly Water Levels (1900 - 2
 plt.ylim(73.5, 76.0)
 
 LO_simulated_fig.savefig("./figs/LO_simulated_fig.png", dpi = 400)
+
+# Alexandria Bay historic [Jan - May 2017]
+abay_historic_fig = plt.figure()
+plt.plot(abay_historic_wtlvl["dates"], abay_historic_wtlvl["wt_lvl__m"], c = "k")
+plt.scatter(abay_historic_wtlvl["dates"], abay_historic_wtlvl["wt_lvl__m"], s = 1, c="k")
+plt.ylabel("Water level (m)")
+plt.xlabel("Date")
+plt.xticks(np.arange(0, 151, step=20), rotation = 0, fontsize = 6)
+abay_historic_fig.suptitle("Alexandria Bay historical daily water levels (Jan - May 2017)")
+plt.title("Datum: IGLD 1985", loc = "left", fontsize = 10)
+
+abay_historic_fig.savefig("./figs/abay_historic_fig.png", dpi = 400)
+
+# Alexandria Bay simulated
+# plot this here!
+
 
 
 
