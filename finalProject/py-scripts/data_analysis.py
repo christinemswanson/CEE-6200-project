@@ -183,3 +183,9 @@ plt.ylim(19.9, 22.9)
 pointClaire_simulated_fig.suptitle("Pointe Claire simulated water levels by quarter-month (1900 - 2020)")
 
 pointClaire_simulated_fig.savefig("./figs/pointeClaire_simulated_fig.png", dpi = 400)
+
+# ------------------------------------------------------------------------------------------------
+# MODEL DIAGNOSTIC ASSESSMENT: COMPARE OBSERVED AND SIMULARED R-SQUARED VALUES
+# ------------------------------------------------------------------------------------------------
+
+# CONTINUE HERE
