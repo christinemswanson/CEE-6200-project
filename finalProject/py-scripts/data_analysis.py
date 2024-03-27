@@ -40,10 +40,14 @@ abay_historic_wtlvl["dates"] = abay_dates # append the new dates column for plot
 # Ogdensburg
 ogdensburg_historic_wtlvl = pd.read_csv("./data/historic/cleaned/ogdensburg_wtlvl_cleaned.csv")
 ogdensburg_historic_wtlvl = ogdensburg_historic_wtlvl.iloc[:, 1:4]
+ogdensburg_dates = [date[:10] for date in ogdensburg_historic_wtlvl["date"]] # extract YY-MM-DD from "date"
+ogdensburg_historic_wtlvl["dates"] = ogdensburg_dates # append the new dates column for plotting 
 
 # Pointe Claire (at Lac St. Louis)
 pointeClaire_historic_wtlvl = pd.read_csv("./data/historic/cleaned/pointClaire_wtlvl_cleaned.csv")
-pointeClaire_historic_wtlvl = pointeClaire_historic_wtlvl.iloc[:, 1:9]
+pointeClaire_historic_wtlvl = pointeClaire_historic_wtlvl.iloc[:, 1:9].rename(columns = {"DD":"DAY"})
+pointeClaire_historic_wtlvl["Date"] = pd.to_datetime(pointeClaire_historic_wtlvl[["YEAR", "month", "DAY"]], errors='coerce') # make date column 
+# errors = "coerce" to account for leap years
 
 # load simulated water levels and flows along SLR and LO from 
 # Plan 2014 simulation model output 
@@ -58,6 +62,10 @@ LO_simulated_data["Date"] = pd.to_datetime(LO_simulated_data[["Year", "Month"]].
 # ------------------------------------------------------------------------------------------------
 
 # Visualize the observed and simulated data as a sanity check for data QAQC
+
+# ------------------------------------------------------------------------------------------------
+# DATA VISUALIZATION: LAKE ONTARIO OBSERVED AND SIMULATED WATER LEVELS
+# ------------------------------------------------------------------------------------------------
 
 # LO historic [1918 - 2020]
 LO_historic_fig = plt.figure()
@@ -81,6 +89,10 @@ plt.ylim(73.5, 76.0)
 
 LO_simulated_fig.savefig("./figs/LO_simulated_fig.png", dpi = 400)
 
+# ------------------------------------------------------------------------------------------------
+# DATA VISUALIZATION: ALEXANDRIA BAY OBSERVED AND SIMULATED WATER LEVELS
+# ------------------------------------------------------------------------------------------------
+
 # Alexandria Bay historic [Jan - May 2017]
 abay_historic_fig = plt.figure()
 plt.plot(abay_historic_wtlvl["dates"], abay_historic_wtlvl["wt_lvl__m"], c = "k")
@@ -93,10 +105,81 @@ plt.title("Datum: IGLD 1985", loc = "left", fontsize = 10)
 
 abay_historic_fig.savefig("./figs/abay_historic_fig.png", dpi = 400)
 
-# Alexandria Bay simulated
-# plot this here!
+# Alexandria Bay simulated [Jan - May 2017]
 
+# extract from LO simulated data just Jan - May 2017
+LO_simulated_data_filtered = LO_simulated_data[LO_simulated_data["Year"] == 2017]
+LO_simulated_data_filtered = LO_simulated_data_filtered[LO_simulated_data_filtered["Month"].isin([1,2,3,4,5])]
 
+abay_simulated_fig = plt.figure(figsize = (7,4))
+plt.plot(LO_simulated_data_filtered["QM"], LO_simulated_data_filtered["alexbayLevel"], c = "k")
+plt.scatter(LO_simulated_data_filtered["QM"], LO_simulated_data_filtered["alexbayLevel"], s = 1, c="k")
+plt.ylabel("Simulated water level (m)")
+plt.xlabel("Quarter-month")
+plt.xticks(np.arange(0, 21, step=1), rotation = 0)
+abay_simulated_fig.suptitle("Alexandria Bay simulated water levels by quarter-month (Jan - May 2017)")
+#plt.title("Datum: IGLD 1985", loc = "left", fontsize = 10)
 
+abay_simulated_fig.savefig("./figs/abay_simulated_fig.png", dpi = 400)
 
+# MIGHT WANT TO COME BACK TO THIS TO MAKE THE X-AXIS
+# ACTUAL DATES AS OPPOSED TO QUARTER-MONTHS SO YOU CAN 
+# DIRECTLY COMPARE TO THE OBSEERVED WATER LEVELS - ASK SCOTT
 
+# ------------------------------------------------------------------------------------------------
+# DATA VISUALIZATION: OGDENSBURG OBSERVED AND SIMULATED WATER LEVELS
+# ------------------------------------------------------------------------------------------------
+
+# Ogdensburg historic [Jan - May 2017]
+ogdensburg_historic_fig = plt.figure()
+plt.plot(ogdensburg_historic_wtlvl["dates"], ogdensburg_historic_wtlvl["wt_lvl__m"], c = "k")
+plt.scatter(ogdensburg_historic_wtlvl["dates"], ogdensburg_historic_wtlvl["wt_lvl__m"], s = 1, c="k")
+plt.ylabel("Water level (m)")
+plt.xlabel("Date")
+plt.xticks(np.arange(0, 151, step=20), rotation = 0, fontsize = 6)
+ogdensburg_historic_fig.suptitle("Ogdensburg historical daily water levels (Jan - May 2017)")
+plt.title("Datum: IGLD 1985", loc = "left", fontsize = 10)
+
+ogdensburg_historic_fig.savefig("./figs/ogdensburg_historic_fig.png", dpi = 400)
+
+# Ogdensburg simulated [Jan - May 2017]
+ogdensburg_simulated_fig = plt.figure(figsize = (7,4))
+plt.plot(LO_simulated_data_filtered["QM"], LO_simulated_data_filtered["ogdensburgLevel"], c = "k")
+plt.scatter(LO_simulated_data_filtered["QM"], LO_simulated_data_filtered["ogdensburgLevel"], s = 1, c="k")
+plt.ylabel("Simulated water level (m)")
+plt.xlabel("Quarter-month")
+plt.xticks(np.arange(0, 21, step=1), rotation = 0)
+ogdensburg_simulated_fig.suptitle("Ogdensburg simulated water levels by quarter-month (Jan - May 2017)")
+
+ogdensburg_simulated_fig.savefig("./figs/ogdensburg_simulated_fig.png", dpi = 400)
+
+# MIGHT WANT TO COME BACK TO THIS TO MAKE THE X-AXIS
+# ACTUAL DATES AS OPPOSED TO QUARTER-MONTHS SO YOU CAN 
+# DIRECTLY COMPARE TO THE OBSEERVED WATER LEVELS - ASK SCOTT
+
+# ------------------------------------------------------------------------------------------------
+# DATA VISUALIZATION: POINTE CLAIRE OBSERVED AND SIMULATED WATER LEVELS
+# ------------------------------------------------------------------------------------------------
+
+# Pointe Claire historic [1915 - 2022]
+pointeClaire_historic_fig = plt.figure()
+plt.plot(pointeClaire_historic_wtlvl["Date"], pointeClaire_historic_wtlvl["wt_lvl__m"], c = "k")
+#plt.scatter(pointeClaire_historic_wtlvl["Date"], pointeClaire_historic_wtlvl["wt_lvl__m"], s = 1, c="k")
+plt.ylabel("Water level (m)")
+plt.xlabel("Date")
+#plt.xticks(np.arange(0, 151, step=20), rotation = 0, fontsize = 6)
+pointeClaire_historic_fig.suptitle("Pointe Claire historical daily water levels (1915 - 2022)")
+plt.title("Datum: IGLD 1985", loc = "left", fontsize = 10)
+
+pointeClaire_historic_fig.savefig("./figs/pointeClaire_historic_fig.png", dpi = 400)
+
+# Pointe Claire simulated [1900 - 2020]
+pointClaire_simulated_fig = plt.figure(figsize = (7,4))
+plt.plot(LO_simulated_data["Date"], LO_simulated_data["ptclaireLevel"], c = "k")
+#plt.scatter(LO_simulated_data["Date"], LO_simulated_data["ptclaireLevel"], s = 1, c="k")
+plt.ylabel("Simulated water level (m)")
+plt.ylim(19.9, 22.9)
+#plt.xticks(np.arange(0, 21, step=1), rotation = 0)
+pointClaire_simulated_fig.suptitle("Pointe Claire simulated water levels by quarter-month (1900 - 2020)")
+
+pointClaire_simulated_fig.savefig("./figs/pointeClaire_simulated_fig.png", dpi = 400)
