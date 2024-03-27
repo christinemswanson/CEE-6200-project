@@ -18,6 +18,10 @@ import os
 wd = "C:/Users/cms549/Desktop/GitHub/CEE-6200-project/finalProject" 
 os.chdir(wd)
 
+# ------------------------------------------------------------------------------------------------
+# LOAD DATA
+# ------------------------------------------------------------------------------------------------
+
 # load LO and SLR cleaned historical water level data, processed in "load_data" script
 LO_historic_wtlvl = pd.read_csv("./data/historic/cleaned/LO_wtlvl_cleaned.csv")
 LO_historic_wtlvl = LO_historic_wtlvl.iloc[:, 1:5] # remove repeated index column
@@ -46,6 +50,10 @@ LO_simulated_data = pd.read_table("./data/simulation_output/S1.txt")
 LO_simulated_data["Date"] = pd.to_datetime(LO_simulated_data[["Year", "Month"]].assign(DAY=1)) # note,
 # days are meaningless here: the unit of observation is only YY-MM, not day
 
+# ------------------------------------------------------------------------------------------------
+# DATA VISUALIZATION
+# ------------------------------------------------------------------------------------------------
+
 # Visualize the observed and simulated data as a sanity check for data QAQC
 
 # LO historic
@@ -69,5 +77,7 @@ LO_simulated_fig.suptitle("Lake Ontario Simulated Monthly Water Levels (1900 - 2
 plt.ylim(73.5, 76.0)
 
 LO_simulated_fig.savefig("./figs/LO_simulated_fig.png", dpi = 400)
+
+
 
 
