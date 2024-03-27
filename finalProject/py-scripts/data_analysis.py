@@ -47,7 +47,7 @@ LO_simulated_data = pd.read_table("./data/simulation_output/S1.txt")
 LO_historic_fig = plt.figure()
 plt.plot(LO_historic_wtlvl["Date"], LO_historic_wtlvl["wt_lvl__m"], c = "k")
 plt.scatter(LO_historic_wtlvl["Date"], LO_historic_wtlvl["wt_lvl__m"], s = 1, c="k")
-plt.ylabel("Water levels (m)")
+plt.ylabel("Water level (m)")
 LO_historic_fig.suptitle("Lake Ontario Historical Monthly Average Water Levels (1918 - 2020)")
 plt.title("Datum: IGLD 1985", loc = "left", fontsize = 10)
 
