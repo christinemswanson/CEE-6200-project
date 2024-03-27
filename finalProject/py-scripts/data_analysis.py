@@ -42,15 +42,32 @@ pointeClaire_historic_wtlvl = pointeClaire_historic_wtlvl.iloc[:, 1:9]
 # Plan 2014 simulation model output 
 LO_simulated_data = pd.read_table("./data/simulation_output/S1.txt")
 
+# add YY-MM column to LO simulated
+LO_simulated_data["Date"] = pd.to_datetime(LO_simulated_data[["Year", "Month"]].assign(DAY=1)) # note,
+# days are meaningless here: the unit of observation is only YY-MM, not day
+
 # Visualize the observed and simulated data as a sanity check for data QAQC
 
+# LO historic
 LO_historic_fig = plt.figure()
 plt.plot(LO_historic_wtlvl["Date"], LO_historic_wtlvl["wt_lvl__m"], c = "k")
 plt.scatter(LO_historic_wtlvl["Date"], LO_historic_wtlvl["wt_lvl__m"], s = 1, c="k")
 plt.ylabel("Water level (m)")
 LO_historic_fig.suptitle("Lake Ontario Historical Monthly Average Water Levels (1918 - 2020)")
 plt.title("Datum: IGLD 1985", loc = "left", fontsize = 10)
+plt.ylim(73.5, 76.0)
 
 LO_historic_fig.savefig("./figs/LO_historic_fig.png", dpi = 400)
+
+# LO simulated
+LO_simulated_fig = plt.figure()
+plt.plot(LO_simulated_data["Date"], LO_simulated_data["ontLevel"], c = "k")
+#plt.scatter(LO_simulated_data["Date"], LO_simulated_data["ontLevel"], s = 1, c="k")
+plt.ylabel("Simulated water level (m)")
+LO_simulated_fig.suptitle("Lake Ontario Simulated Monthly Water Levels (1900 - 2020)")
+#plt.title("Datum: IGLD 1985", loc = "left", fontsize = 10)
+plt.ylim(73.5, 76.0)
+
+LO_simulated_fig.savefig("./figs/LO_simulated_fig.png", dpi = 400)
 
 
