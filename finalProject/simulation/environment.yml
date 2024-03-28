@@ -1,0 +1,6 @@
+name: py-plan2014
+channels:
+  - defaults
+dependencies:
+  - python=3.7.7
+prefix: /Users/kylasemmendinger/opt/anaconda3/envs/py-plan2014
