@@ -14,6 +14,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 from datetime import datetime
+import matplotlib.lines as mlines
 
 # set wd
 wd = "C:/Users/cms549/Desktop/GitHub/CEE-6200-project/finalProject" 
@@ -185,7 +186,53 @@ pointClaire_simulated_fig.suptitle("Pointe Claire simulated water levels by quar
 pointClaire_simulated_fig.savefig("./figs/pointeClaire_simulated_fig.png", dpi = 400)
 
 # ------------------------------------------------------------------------------------------------
-# MODEL DIAGNOSTIC ASSESSMENT: COMPARE OBSERVED AND SIMULARED R-SQUARED VALUES
+# MODEL DIAGNOSTIC ASSESSMENT: COMPARE OBSERVED AND SIMULATED VIA SCATTER PLOTS [2017 only]
 # ------------------------------------------------------------------------------------------------
 
-# CONTINUE HERE
+# Lake Ontario water levels: simulated versus observed
+
+# filter the LO historic water level data to be just in 2017
+LO_historic_wtlvl_filtered = LO_historic_wtlvl[LO_historic_wtlvl["Year"] == 2017]
+LO_historic_wtlvl_filtered = LO_historic_wtlvl_filtered[LO_historic_wtlvl_filtered["month"].isin([1,2,3,4,5])]
+
+# Aggregate the LO simulated water level data to compute
+# monthly means to match-up w/ the historical data
+
+LO_simulated_data_filtered_mean = LO_simulated_data_filtered[["Sim", "Year", "Month", "QM", "ontLevel", "Date"]]
+LO_simulated_data_filtered_mean = LO_simulated_data_filtered_mean.groupby("Month").mean("ontLevel").reset_index()
+
+LO_scatter_fig, ax = plt.subplots(figsize = (9,5))
+plt.scatter(LO_simulated_data_filtered_mean["ontLevel"], LO_historic_wtlvl_filtered["wt_lvl__m"], color = "k")
+plt.xlabel("Simulated water level (m)")
+plt.ylabel("Observed water level (m)")
+plt.xlim(74.5, 75.9)
+plt.ylim(74.5, 75.9)
+
+# add 1:1 line 
+line = mlines.Line2D([0, 1], [0, 1], color='red')
+transform = ax.transAxes
+line.set_transform(transform)
+ax.add_line(line)
+
+#plt.plot([74.4, 74.6, 74.8, 75, 75.2, 75.4, 75.6, 75.8, 76], [74.4, 74.6, 74.8, 75, 75.2, 75.4, 75.6, 75.8, 76], c = "blue")
+plt.title("Lake Ontario simulated and observed mean monthly water levels (Jan - May 2017)")
+plt.legend(["", "1:1 line"])
+
+LO_scatter_fig.savefig("./figs/LO_compare_scatter_fig.png", dpi = 400)
+
+# simulated is too high? Observed data is low compared to simulated? 
+# so simulated is overpredicting (slightly) during this time? 
+# is the 1:1 line right? 
+
+
+# NOT SURE WHAT TO DO...THE DATA ARE NOT REPORTED ON THE SAME TIME STEP,
+# SO I'M NOT SURE IF I CAN MAKE A DIRECT COMPARISON B/W SIMULATED 
+# AND OBSERVED WATER LEVEL DATA
+# HISTORICAL IS MONTHLY MEANS, SO I THINK I NEED TO AGGREGATE THE SIMULATED DATA
+# TO THIS LEVEL OF GRANULARITY 
+
+
+
+
+
+
