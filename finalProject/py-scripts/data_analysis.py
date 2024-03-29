@@ -54,8 +54,21 @@ pointeClaire_historic_wtlvl["Date"] = pd.to_datetime(pointeClaire_historic_wtlvl
 # Plan 2014 simulation model output 
 LO_simulated_data = pd.read_table("./data/simulation_output/S1.txt")
 
+# qm to day conversion
+#conv = 7.6
+
+# add day columns to simulated data frames, to make the Date column
+#LO_simulated_data["Day"] = np.round(LO_simulated_data["QM"]*conv % 30.4, 0)
+
 # add YY-MM column to LO simulated
 LO_simulated_data["Date"] = pd.to_datetime(LO_simulated_data[["Year", "Month"]].assign(DAY=1)) # note,
+# days are meaningless here: the unit of observation is only YY-MM, not day
+
+# load simulated water levels along SLR and LO, simulated just for 2017
+# I.e., initial condition set to 2017 historical water levels
+
+LO_simulated_data_2017 = pd.read_table("./simulation/output/historic/full/sq/historic/S_2017_2_1.txt")
+LO_simulated_data_2017["Date"] = pd.to_datetime(LO_simulated_data_2017[["Year", "Month"]].assign(DAY=1)) # note,
 # days are meaningless here: the unit of observation is only YY-MM, not day
 
 # ------------------------------------------------------------------------------------------------
@@ -220,16 +233,83 @@ plt.legend(["", "1:1 line"])
 
 LO_scatter_fig.savefig("./figs/LO_compare_scatter_fig.png", dpi = 400)
 
-# simulated is too high? Observed data is low compared to simulated? 
+# simulated is too high. Observed data is low compared to simulated?.
 # so simulated is overpredicting (slightly) during this time? 
-# is the 1:1 line right? 
+
+# Because the simulated water levels are too high in the plot above, the plot below
+# uses the simulated water levels on LO, where the initial conditions of the model
+# are set to 2017 historical water levels 
+# Lake Ontario water levels, initialized at 2017 conditions - simulated and observed
+
+# extract from LO simulated data just Jan - May 2017
+LO_simulated_data_2017_filtered = LO_simulated_data_2017[LO_simulated_data_2017["Year"] == 2017]
+LO_simulated_data_2017_filtered = LO_simulated_data_2017_filtered[LO_simulated_data_2017_filtered["Month"].isin([1,2,3,4,5])]
+
+# Aggregate the LO simulated water level data to compute
+# monthly means to match-up w/ the historical data
+
+LO_simulated_data_2017_filtered_mean = LO_simulated_data_2017_filtered[["Sim", "Year", "Month", "QM", "ontLevel", "Date"]]
+LO_simulated_data_2017_filtered_mean = LO_simulated_data_2017_filtered_mean.groupby("Month").mean("ontLevel").reset_index()
+
+# plot
+LO_2017_scatter_fig, ax2 = plt.subplots(figsize = (9,5))
+plt.scatter(LO_simulated_data_2017_filtered_mean["ontLevel"], LO_historic_wtlvl_filtered["wt_lvl__m"], color = "k")
+plt.xlabel("Simulated water level (m)")
+plt.ylabel("Observed water level (m)")
+plt.xlim(74.5, 75.9)
+plt.ylim(74.5, 75.9)
+
+# add 1:1 line 
+line = mlines.Line2D([0, 1], [0, 1], color='red')
+transform = ax2.transAxes
+line.set_transform(transform)
+ax2.add_line(line)
+
+#plt.plot([74.4, 74.6, 74.8, 75, 75.2, 75.4, 75.6, 75.8, 76], [74.4, 74.6, 74.8, 75, 75.2, 75.4, 75.6, 75.8, 76], c = "blue")
+plt.suptitle("Lake Ontario simulated and observed mean monthly water levels (Jan - May 2017)")
+plt.title("Model initialized at 2017 historical conditions")
+plt.legend(["", "1:1 line"])
+
+LO_2017_scatter_fig.savefig("./figs/LO_2017_compare_scatter_fig.png", dpi = 400)
+
+# this adjustment didn't really change much? Figures look the same?
+
+# plot the time series for 2017 data, simulated (both initializations), and observed 
+LO_historic_wtlvl_2017 = LO_historic_wtlvl[LO_historic_wtlvl["Year"] == 2017] # historical wt lvls for 2017 only
+
+LO_simulated_data_2017_filtered = LO_simulated_data_2017[LO_simulated_data_2017["Year"] == 2017]
+LO_simulated_data_2017_filtered_agg = LO_simulated_data_2017_filtered.groupby("Month").mean("ontLevel").reset_index()
+LO_simulated_data_2017_filtered_agg["Date"] = pd.to_datetime(LO_simulated_data_2017_filtered_agg[["Year", "Month"]].assign(DAY=1))
 
 
-# NOT SURE WHAT TO DO...THE DATA ARE NOT REPORTED ON THE SAME TIME STEP,
-# SO I'M NOT SURE IF I CAN MAKE A DIRECT COMPARISON B/W SIMULATED 
-# AND OBSERVED WATER LEVEL DATA
-# HISTORICAL IS MONTHLY MEANS, SO I THINK I NEED TO AGGREGATE THE SIMULATED DATA
-# TO THIS LEVEL OF GRANULARITY 
+LO_simulated_data_filtered = LO_simulated_data[LO_simulated_data["Year"] == 2017]
+LO_simulated_data_filtered_agg = LO_simulated_data_filtered.groupby("Month").mean("ontLevel").reset_index()
+LO_simulated_data_filtered_agg["Date"] = pd.to_datetime(LO_simulated_data_filtered_agg[["Year", "Month"]].assign(DAY=1))
+
+# Plot LO historic, and 2 versions of simulated for 2017 all as time series on same plot 
+LO_time_series_fig = plt.figure()
+
+plt.plot(LO_historic_wtlvl_2017["Date"], LO_historic_wtlvl_2017["wt_lvl__m"], c = "k")
+plt.scatter(LO_historic_wtlvl_2017["Date"], LO_historic_wtlvl_2017["wt_lvl__m"], s = 1, c="k")
+
+# simulated water levels, initialized with 1900 conditions
+plt.plot(LO_simulated_data_filtered_agg["Date"], LO_simulated_data_filtered_agg["ontLevel"], c = "blue")
+plt.scatter(LO_simulated_data_filtered_agg["Date"], LO_simulated_data_filtered_agg["ontLevel"], s = 1, c="blue")
+
+# simulated water levels, initialized with 2017 conditions
+plt.plot(LO_simulated_data_2017_filtered_agg["Date"], LO_simulated_data_2017_filtered_agg["ontLevel"], c = "red")
+plt.scatter(LO_simulated_data_2017_filtered_agg["Date"], LO_simulated_data_2017_filtered_agg["ontLevel"], s = 1, c="red")
+
+plt.ylabel("Water level (m)")
+LO_time_series_fig.suptitle("Lake Ontario Simulated and Observed Water Levels (2017)")
+plt.title("Red and blue lines differ by the simulation model's initial conditions (1900 or 2017)", fontsize = 7)
+plt.legend(["historic", "", "1900 simulated", "", "2017 simulated", ""], 
+           loc = "upper right", 
+           fontsize = 7)
+#plt.ylim(73.5, 76.0)
+
+LO_time_series_fig.savefig("./figs/LO_time_series_fig.png", dpi = 400)
+
 
 
 
