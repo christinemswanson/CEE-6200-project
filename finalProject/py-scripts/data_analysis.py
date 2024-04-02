@@ -200,6 +200,7 @@ pointClaire_simulated_fig.savefig("./figs/pointeClaire_simulated_fig.png", dpi =
 
 # ------------------------------------------------------------------------------------------------
 # MODEL DIAGNOSTIC ASSESSMENT: COMPARE OBSERVED AND SIMULATED VIA SCATTER PLOTS [2017 only]
+# Lake Ontario Comparisons with 2 initializations of the simulated data
 # ------------------------------------------------------------------------------------------------
 
 # Lake Ontario water levels: simulated versus observed
@@ -215,7 +216,8 @@ LO_simulated_data_filtered_mean = LO_simulated_data_filtered[["Sim", "Year", "Mo
 LO_simulated_data_filtered_mean = LO_simulated_data_filtered_mean.groupby("Month").mean("ontLevel").reset_index()
 
 LO_scatter_fig, ax = plt.subplots(figsize = (9,5))
-plt.scatter(LO_simulated_data_filtered_mean["ontLevel"], LO_historic_wtlvl_filtered["wt_lvl__m"], color = "k")
+plt.scatter(LO_simulated_data_filtered_mean["ontLevel"], LO_historic_wtlvl_filtered["wt_lvl__m"], 
+            color = "k", label='_nolegend_')
 plt.xlabel("Simulated water level (m)")
 plt.ylabel("Observed water level (m)")
 plt.xlim(74.5, 75.9)
@@ -229,7 +231,7 @@ ax.add_line(line)
 
 #plt.plot([74.4, 74.6, 74.8, 75, 75.2, 75.4, 75.6, 75.8, 76], [74.4, 74.6, 74.8, 75, 75.2, 75.4, 75.6, 75.8, 76], c = "blue")
 plt.title("Lake Ontario simulated and observed mean monthly water levels (Jan - May 2017)")
-plt.legend(["", "1:1 line"])
+plt.legend(["1:1 line"])
 
 LO_scatter_fig.savefig("./figs/LO_compare_scatter_fig.png", dpi = 400)
 
@@ -238,7 +240,7 @@ LO_scatter_fig.savefig("./figs/LO_compare_scatter_fig.png", dpi = 400)
 
 # Because the simulated water levels are too high in the plot above, the plot below
 # uses the simulated water levels on LO, where the initial conditions of the model
-# are set to 2017 historical water levels 
+# are set to *2017 historical water levels* 
 # Lake Ontario water levels, initialized at 2017 conditions - simulated and observed
 
 # extract from LO simulated data just Jan - May 2017
@@ -253,7 +255,9 @@ LO_simulated_data_2017_filtered_mean = LO_simulated_data_2017_filtered_mean.grou
 
 # plot
 LO_2017_scatter_fig, ax2 = plt.subplots(figsize = (9,5))
-plt.scatter(LO_simulated_data_2017_filtered_mean["ontLevel"], LO_historic_wtlvl_filtered["wt_lvl__m"], color = "k")
+plt.scatter(LO_simulated_data_2017_filtered_mean["ontLevel"], LO_historic_wtlvl_filtered["wt_lvl__m"], 
+            color = "k",
+            label='_nolegend_')
 plt.xlabel("Simulated water level (m)")
 plt.ylabel("Observed water level (m)")
 plt.xlim(74.5, 75.9)
@@ -268,7 +272,7 @@ ax2.add_line(line)
 #plt.plot([74.4, 74.6, 74.8, 75, 75.2, 75.4, 75.6, 75.8, 76], [74.4, 74.6, 74.8, 75, 75.2, 75.4, 75.6, 75.8, 76], c = "blue")
 plt.suptitle("Lake Ontario simulated and observed mean monthly water levels (Jan - May 2017)")
 plt.title("Model initialized at 2017 historical conditions")
-plt.legend(["", "1:1 line"])
+plt.legend(["1:1 line"])
 
 LO_2017_scatter_fig.savefig("./figs/LO_2017_compare_scatter_fig.png", dpi = 400)
 
@@ -290,29 +294,147 @@ LO_simulated_data_filtered_agg["Date"] = pd.to_datetime(LO_simulated_data_filter
 LO_time_series_fig = plt.figure()
 
 plt.plot(LO_historic_wtlvl_2017["Date"], LO_historic_wtlvl_2017["wt_lvl__m"], c = "k")
-plt.scatter(LO_historic_wtlvl_2017["Date"], LO_historic_wtlvl_2017["wt_lvl__m"], s = 1, c="k")
+plt.scatter(LO_historic_wtlvl_2017["Date"], LO_historic_wtlvl_2017["wt_lvl__m"], s = 1, 
+            c="k", label='_nolegend_')
 
 # simulated water levels, initialized with 1900 conditions
 plt.plot(LO_simulated_data_filtered_agg["Date"], LO_simulated_data_filtered_agg["ontLevel"], c = "blue")
-plt.scatter(LO_simulated_data_filtered_agg["Date"], LO_simulated_data_filtered_agg["ontLevel"], s = 1, c="blue")
+plt.scatter(LO_simulated_data_filtered_agg["Date"], LO_simulated_data_filtered_agg["ontLevel"], 
+            s = 1, c="blue", label='_nolegend_')
 
 # simulated water levels, initialized with 2017 conditions
 plt.plot(LO_simulated_data_2017_filtered_agg["Date"], LO_simulated_data_2017_filtered_agg["ontLevel"], c = "red")
-plt.scatter(LO_simulated_data_2017_filtered_agg["Date"], LO_simulated_data_2017_filtered_agg["ontLevel"], s = 1, c="red")
+plt.scatter(LO_simulated_data_2017_filtered_agg["Date"], LO_simulated_data_2017_filtered_agg["ontLevel"], 
+            s = 1, c="red", label='_nolegend_')
 
 plt.ylabel("Water level (m)")
 LO_time_series_fig.suptitle("Lake Ontario Simulated and Observed Water Levels (2017)")
 plt.title("Red and blue lines differ by the simulation model's initial conditions (1900 or 2017)", fontsize = 7)
-plt.legend(["historic", "", "1900 simulated", "", "2017 simulated", ""], 
+plt.legend(["historic", "1900 simulated", "2017 simulated"], 
            loc = "upper right", 
            fontsize = 7)
 #plt.ylim(73.5, 76.0)
 
 LO_time_series_fig.savefig("./figs/LO_time_series_fig.png", dpi = 400)
 
+# ------------------------------------------------------------------------------------------------
+# MODEL DIAGNOSTIC ASSESSMENT: COMPARE OBSERVED AND SIMULATED VIA SCATTER PLOTS [2017 only]
+# ALEXANDRIA BAY COMPARISON
+# ------------------------------------------------------------------------------------------------
 
+# Alexandria Bay simulated versus observed using Plan 2014 default initial conditions
 
+# add a month column to the A Bay historical wt lvl data frame
+abay_historic_wtlvl["Month"] = [abay_historic_wtlvl["dates"][row][6] for row in range(0,151)]
 
+# aggregate the A Bay historical data to monthly averages
+abay_historic_wtlvl_mean = abay_historic_wtlvl.groupby("Month").mean("wt_lvl__m").reset_index()
 
+# filter the LO simulated data frame to just Jan - May 2017 (I overwrote this)
+LO_simulated_data_2017_filtered = LO_simulated_data_2017_filtered[LO_simulated_data_2017_filtered["Month"].isin([1,2,3,4,5])]
 
+# aggregate the LO simulated Jan - May 2017 data to monthly averages for A Bay
+abay_simulated_data_2017_filtered_agg = LO_simulated_data_2017_filtered.groupby("Month").mean("alexbayLevel").reset_index()
 
+# plot
+abay_scatter_fig, ax = plt.subplots()
+plt.scatter(abay_simulated_data_2017_filtered_agg["alexbayLevel"], abay_historic_wtlvl_mean["wt_lvl__m"], 
+            color = "k", label='_nolegend_')
+plt.xlabel("Simulated water level (m)")
+plt.ylabel("Observed water level (m)")
+#plt.xlim(74.5, 75.9)
+#plt.ylim(74.5, 75.9)
+
+# add 1:1 line 
+line = mlines.Line2D([0, 1], [0, 1], color='red')
+transform = ax.transAxes
+line.set_transform(transform)
+ax.add_line(line)
+
+plt.title("Alexandria Bay simulated and observed mean monthly water levels (Jan - May 2017)",
+          fontsize = 9.5)
+plt.legend(["1:1 line"])
+
+abay_scatter_fig.savefig("./figs/abay_compare_scatter_fig.png", dpi = 400)
+ 
+# The A Bay simulated and observed scatter plot where the simulation was initialized
+# with the Plan 2014 default conditons (1900) seems to have a fine correspondance
+# b/w simulated and observed data...so no need to replicate this plot with the 
+# 2017 initial conditions?
+
+# ------------------------------------------------------------------------------------------------
+# MODEL DIAGNOSTIC ASSESSMENT: COMPARE OBSERVED AND SIMULATED VIA SCATTER PLOTS [2017 only]
+# OGDENSBURG COMPARISON
+# ------------------------------------------------------------------------------------------------
+
+# Ogdensburg simulated versus observed using Plan 2014 default initial conditions
+
+# add a month column to the Ogdensburg historical wt lvl data frame
+ogdensburg_historic_wtlvl["Month"] = [ogdensburg_historic_wtlvl["dates"][row][6] for row in range(0,151)]
+
+# aggregate the Ogdensburg historical data to monthly averages
+ogdensburg_historic_wtlvl_mean = ogdensburg_historic_wtlvl.groupby("Month").mean("wt_lvl__m").reset_index()
+
+# aggregate the LO simulated Jan - May 2017 data to monthly averages for Ogdensburg 
+ogdensburg_simulated_data_2017_filtered_agg = LO_simulated_data_2017_filtered.groupby("Month").mean("ogdensburgLevel").reset_index()
+
+# plot
+ogdensburg_scatter_fig, ax = plt.subplots()
+plt.scatter(ogdensburg_simulated_data_2017_filtered_agg["ogdensburgLevel"], ogdensburg_historic_wtlvl_mean["wt_lvl__m"], 
+            color = "k", label='_nolegend_')
+plt.xlabel("Simulated water level (m)")
+plt.ylabel("Observed water level (m)")
+#plt.xlim(74.5, 75.9)
+#plt.ylim(74.5, 75.9)
+
+# add 1:1 line 
+line = mlines.Line2D([0, 1], [0, 1], color='red')
+transform = ax.transAxes
+line.set_transform(transform)
+ax.add_line(line)
+
+plt.title("Ogdensburg simulated and observed mean monthly water levels (Jan - May 2017)",
+          fontsize = 9.5)
+plt.legend(["1:1 line"])
+
+ogdensburg_scatter_fig.savefig("./figs/ogdensburg_compare_scatter_fig.png", dpi = 400)
+
+# ------------------------------------------------------------------------------------------------
+# MODEL DIAGNOSTIC ASSESSMENT: COMPARE OBSERVED AND SIMULATED VIA SCATTER PLOTS [2017 only]
+# POINTE CLAIRE COMPARISON
+# ------------------------------------------------------------------------------------------------
+
+# Pointe Claire simulated versus observed using Plan 2014 default initial conditions
+
+# filter the historical Pointe Claire water level data to Jan - May 2017
+pointeClaire_historic_wtlvl_filtered_2017 = pointeClaire_historic_wtlvl[pointeClaire_historic_wtlvl["YEAR"] == 2017]
+pointeClaire_historic_wtlvl_filtered_2017 = pointeClaire_historic_wtlvl_filtered_2017[pointeClaire_historic_wtlvl["month"].isin([1,2,3,4,5])]
+
+# aggregate the filtered Pointe Claire data to monthly average wt lvls
+pointeClaire_historic_wtlvl_filtered_2017_mean = pointeClaire_historic_wtlvl_filtered_2017.groupby("month").mean("wt_lvl__m").reset_index()
+
+# aggregate the LO simulated Jan - May 2017 data to monthly averages for Pointe Claire 
+pointeClaire_simulated_data_2017_filtered_agg = LO_simulated_data_2017_filtered.groupby("Month").mean("ptclaireLevel").reset_index()
+
+# plot
+pointeClaire_scatter_fig, ax = plt.subplots()
+plt.scatter(pointeClaire_simulated_data_2017_filtered_agg["ptclaireLevel"], pointeClaire_historic_wtlvl_filtered_2017_mean["wt_lvl__m"], 
+            color = "k", label='_nolegend_')
+plt.xlabel("Simulated water level (m)")
+plt.ylabel("Observed water level (m)")
+#plt.xlim(74.5, 75.9)
+#plt.ylim(74.5, 75.9)
+
+# add 1:1 line 
+line = mlines.Line2D([0, 1], [0, 1], color='red')
+transform = ax.transAxes
+line.set_transform(transform)
+ax.add_line(line)
+
+plt.title("Pointe Claire simulated and observed mean monthly water levels (Jan - May 2017)",
+          fontsize = 9.5)
+plt.legend(["1:1 line"])
+
+pointeClaire_scatter_fig.savefig("./figs/pointeClaire_compare_scatter_fig.png", dpi = 400)
+
+# February and March do not line up for the pointe claire figure...
