@@ -58,17 +58,33 @@ LO_simulated_data = pd.read_table("./data/simulation_output/S1.txt")
 #conv = 7.6
 
 # add day columns to simulated data frames, to make the Date column
-#LO_simulated_data["Day"] = np.round(LO_simulated_data["QM"]*conv % 30.4, 0)
+#LO_simulated_data["Day"] = np.round(LO_simulated_data["QM"]*conv % 30.5, 0)
+quarter_month_to_days = {1: 7, 2: 15, 3: 23, 4: 28,
+                         5: 7, 6: 15, 7: 23, 8: 28,
+                         9: 7, 10: 15, 11: 23, 12: 28,
+                         13: 7, 14: 15, 15: 23, 16: 28,
+                         17: 7, 18: 15, 19: 23, 20: 28,
+                         21: 7, 22: 15, 23: 23, 24: 28,
+                         25: 7, 26: 15, 27: 23, 28: 28,
+                         29: 7, 30: 15, 31: 23, 32: 28,
+                         33: 7, 34: 15, 35: 23, 36: 28,
+                         37: 7, 38: 15, 39: 23, 40: 28,
+                         41: 7, 42: 15, 43: 23, 44: 28,
+                         45: 7, 46: 15, 47: 23, 48: 28} # approximate conversion
+
+#LO_simulated_data["Day"] = np.round(LO_simulated_data["QM"]*conv % 30.5, 0)
+LO_simulated_data["Day"] = LO_simulated_data["QM"].map(quarter_month_to_days)
 
 # add YY-MM column to LO simulated
-LO_simulated_data["Date"] = pd.to_datetime(LO_simulated_data[["Year", "Month"]].assign(DAY=1)) # note,
-# days are meaningless here: the unit of observation is only YY-MM, not day
+LO_simulated_data["Date"] = pd.to_datetime(LO_simulated_data[["Year", "Month", "Day"]]) # note,
+# the days are a little off, but it's close...
 
 # load simulated water levels along SLR and LO, simulated just for 2017
 # I.e., initial condition set to 2017 historical water levels
 
 LO_simulated_data_2017 = pd.read_table("./simulation/output/historic/full/sq/historic/S_2017_2_1.txt")
-LO_simulated_data_2017["Date"] = pd.to_datetime(LO_simulated_data_2017[["Year", "Month"]].assign(DAY=1)) # note,
+LO_simulated_data_2017["Day"] = LO_simulated_data_2017["QM"].map(quarter_month_to_days)
+LO_simulated_data_2017["Date"] = pd.to_datetime(LO_simulated_data_2017[["Year", "Month", "Day"]]) # note,
 # days are meaningless here: the unit of observation is only YY-MM, not day
 
 # ------------------------------------------------------------------------------------------------
@@ -279,32 +295,32 @@ LO_2017_scatter_fig.savefig("./figs/LO_2017_compare_scatter_fig.png", dpi = 400)
 # this adjustment didn't really change much? Figures look the same?
 
 # plot the time series for 2017 data, simulated (both initializations), and observed 
-LO_historic_wtlvl_2017 = LO_historic_wtlvl[LO_historic_wtlvl["Year"] == 2017] # historical wt lvls for 2017 only
+LO_historic_wtlvl_2017 = LO_historic_wtlvl[LO_historic_wtlvl["Year"].isin([2016, 2017])] # historical wt lvls for 2017 only
 
-LO_simulated_data_2017_filtered = LO_simulated_data_2017[LO_simulated_data_2017["Year"] == 2017]
-LO_simulated_data_2017_filtered_agg = LO_simulated_data_2017_filtered.groupby("Month").mean("ontLevel").reset_index()
-LO_simulated_data_2017_filtered_agg["Date"] = pd.to_datetime(LO_simulated_data_2017_filtered_agg[["Year", "Month"]].assign(DAY=1))
+LO_simulated_data_2017_filtered = LO_simulated_data_2017[LO_simulated_data_2017["Year"].isin([2016, 2017])]
+#LO_simulated_data_2017_filtered_agg = LO_simulated_data_2017_filtered.groupby("Month").mean("ontLevel").reset_index()
+#LO_simulated_data_2017_filtered_agg["Date"] = pd.to_datetime(LO_simulated_data_2017_filtered_agg[["Year", "Month"]].assign(DAY=1))
 
 
-LO_simulated_data_filtered = LO_simulated_data[LO_simulated_data["Year"] == 2017]
-LO_simulated_data_filtered_agg = LO_simulated_data_filtered.groupby("Month").mean("ontLevel").reset_index()
-LO_simulated_data_filtered_agg["Date"] = pd.to_datetime(LO_simulated_data_filtered_agg[["Year", "Month"]].assign(DAY=1))
+LO_simulated_data_filtered = LO_simulated_data[LO_simulated_data["Year"].isin([2016, 2017])]
+#LO_simulated_data_filtered_agg = LO_simulated_data_filtered.groupby("Month").mean("ontLevel").reset_index()
+#LO_simulated_data_filtered_agg["Date"] = pd.to_datetime(LO_simulated_data_filtered_agg[["Year", "Month"]].assign(DAY=1))
 
 # Plot LO historic, and 2 versions of simulated for 2017 all as time series on same plot 
-LO_time_series_fig = plt.figure()
+LO_time_series_fig = plt.figure(figsize = (9,5))
 
 plt.plot(LO_historic_wtlvl_2017["Date"], LO_historic_wtlvl_2017["wt_lvl__m"], c = "k")
 plt.scatter(LO_historic_wtlvl_2017["Date"], LO_historic_wtlvl_2017["wt_lvl__m"], s = 1, 
             c="k", label='_nolegend_')
 
-# simulated water levels, initialized with 1900 conditions
-plt.plot(LO_simulated_data_filtered_agg["Date"], LO_simulated_data_filtered_agg["ontLevel"], c = "blue")
-plt.scatter(LO_simulated_data_filtered_agg["Date"], LO_simulated_data_filtered_agg["ontLevel"], 
+# simulated water levels, initialized with 1900 conditions (removed "agg")
+plt.plot(LO_simulated_data_filtered["Date"], LO_simulated_data_filtered["ontLevel"], c = "blue")
+plt.scatter(LO_simulated_data_filtered["Date"], LO_simulated_data_filtered["ontLevel"], 
             s = 1, c="blue", label='_nolegend_')
 
-# simulated water levels, initialized with 2017 conditions
-plt.plot(LO_simulated_data_2017_filtered_agg["Date"], LO_simulated_data_2017_filtered_agg["ontLevel"], c = "red")
-plt.scatter(LO_simulated_data_2017_filtered_agg["Date"], LO_simulated_data_2017_filtered_agg["ontLevel"], 
+# simulated water levels, initialized with 2017 conditions (removed "agg")
+plt.plot(LO_simulated_data_2017_filtered["Date"], LO_simulated_data_2017_filtered["ontLevel"], c = "red")
+plt.scatter(LO_simulated_data_2017_filtered["Date"], LO_simulated_data_2017_filtered["ontLevel"], 
             s = 1, c="red", label='_nolegend_')
 
 plt.ylabel("Water level (m)")
