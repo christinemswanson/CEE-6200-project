@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
-from datetime import datetime
+import datetime as dt
 import matplotlib.lines as mlines
 
 # set wd
@@ -295,16 +295,49 @@ LO_2017_scatter_fig.savefig("./figs/LO_2017_compare_scatter_fig.png", dpi = 400)
 # this adjustment didn't really change much? Figures look the same?
 
 # plot the time series for 2017 data, simulated (both initializations), and observed 
+# COME BACK HERE - MESSED UP TIME SERIES PLOT
+
 LO_historic_wtlvl_2017 = LO_historic_wtlvl[LO_historic_wtlvl["Year"].isin([2016, 2017])] # historical wt lvls for 2017 only
 
+#month_to_str_hist = {
+    #1: " Jan", 2: " Feb", 3:" Mar", 4:" Apr",
+    #5:" May", 6:" Jun", 7:" Jul", 8:" Aug",
+    #9:" Sept", 10:" Oct", 11:" Nov", 12:" Dec"
+#}
+
+#LO_historic_wtlvl_2017['month2'] = LO_historic_wtlvl_2017['month'].map(month_to_str_hist)
+
+
 LO_simulated_data_2017_filtered = LO_simulated_data_2017[LO_simulated_data_2017["Year"].isin([2016, 2017])]
-#LO_simulated_data_2017_filtered_agg = LO_simulated_data_2017_filtered.groupby("Month").mean("ontLevel").reset_index()
+#LO_simulated_data_2017_filtered_agg = LO_simulated_data_2017_filtered.groupby(["Year", "Month"]).mean("ontLevel").reset_index()
 #LO_simulated_data_2017_filtered_agg["Date"] = pd.to_datetime(LO_simulated_data_2017_filtered_agg[["Year", "Month"]].assign(DAY=1))
+
+#month_to_str = {
+    #1: "Jan", 2: "Feb", 3:"Mar", 4:"Apr",
+    #5:"May", 6:"Jun", 7:"Jul", 8:"Aug",
+    #9:"Sept", 10:"Oct", 11:"Nov", 12:"Dec"
+#}
+#LO_simulated_data_2016_filtered_agg['month'] = LO_simulated_data_2016_filtered_agg['Month'].map(month_to_str)
+
+
+#LO_simulated_data_2017_filtered = LO_simulated_data_2017[LO_simulated_data_2017["Year"] == 2017]
+#LO_simulated_data_2017_filtered_agg = LO_simulated_data_2017_filtered.groupby("Month").mean("ontLevel").reset_index()
+
+#LO_simulated_data_2017_filtered_agg['month'] = LO_simulated_data_2017_filtered_agg['Month'].map(month_to_str)
+
+
+# join the dfs
+#LO_simulated_data_16_17_filtered_agg = pd.concat([LO_simulated_data_2016_filtered_agg, LO_simulated_data_2017_filtered_agg])
+
 
 
 LO_simulated_data_filtered = LO_simulated_data[LO_simulated_data["Year"].isin([2016, 2017])]
-#LO_simulated_data_filtered_agg = LO_simulated_data_filtered.groupby("Month").mean("ontLevel").reset_index()
+#LO_simulated_data_filtered_agg = LO_simulated_data_filtered.groupby(["Year", "Month"]).mean("ontLevel").reset_index()
 #LO_simulated_data_filtered_agg["Date"] = pd.to_datetime(LO_simulated_data_filtered_agg[["Year", "Month"]].assign(DAY=1))
+# add a string month column
+#LO_simulated_data_filtered_agg['month'] = LO_simulated_data_filtered_agg['Month'].map(month_to_str)
+
+
 
 # Plot LO historic, and 2 versions of simulated for 2017 all as time series on same plot 
 LO_time_series_fig = plt.figure(figsize = (9,5))
@@ -330,6 +363,9 @@ plt.legend(["historic", "1900 simulated", "2017 simulated"],
            loc = "upper right", 
            fontsize = 7)
 #plt.ylim(73.5, 76.0)
+# add vertical line for last week of May; after this line is when Board deviations occurred
+v_pos = dt.datetime(2017, 5, 24) # Last week of May, 2017
+plt.axvline(x = v_pos, color = "red", linestyle = "--")
 
 LO_time_series_fig.savefig("./figs/LO_time_series_fig.png", dpi = 400)
 
