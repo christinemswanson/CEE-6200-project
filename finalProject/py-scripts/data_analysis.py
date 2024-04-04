@@ -80,7 +80,7 @@ LO_simulated_data["Date"] = pd.to_datetime(LO_simulated_data[["Year", "Month", "
 # the days are a little off, but it's close...
 
 # load simulated water levels along SLR and LO, simulated just for 2017
-# I.e., initial condition set to 2017 historical water levels
+# I.e., initial condition set to *2017 historical water levels*
 
 LO_simulated_data_2017 = pd.read_table("./simulation/output/historic/full/sq/historic/S_2017_2_1.txt")
 LO_simulated_data_2017["Day"] = LO_simulated_data_2017["QM"].map(quarter_month_to_days)
@@ -221,7 +221,7 @@ pointClaire_simulated_fig.savefig("./figs/pointeClaire_simulated_fig.png", dpi =
 
 # Lake Ontario water levels: simulated versus observed
 
-# filter the LO historic water level data to be just in 2017
+# filter the LO historic water level data to be just in 2017, and Jan - May 2017
 LO_historic_wtlvl_filtered = LO_historic_wtlvl[LO_historic_wtlvl["Year"] == 2017]
 LO_historic_wtlvl_filtered = LO_historic_wtlvl_filtered[LO_historic_wtlvl_filtered["month"].isin([1,2,3,4,5])]
 
@@ -259,7 +259,7 @@ LO_scatter_fig.savefig("./figs/LO_compare_scatter_fig.png", dpi = 400)
 # are set to *2017 historical water levels* 
 # Lake Ontario water levels, initialized at 2017 conditions - simulated and observed
 
-# extract from LO simulated data just Jan - May 2017
+# extract from LO simulated data (initialized at 2017 levels) just Jan - May 2017
 LO_simulated_data_2017_filtered = LO_simulated_data_2017[LO_simulated_data_2017["Year"] == 2017]
 LO_simulated_data_2017_filtered = LO_simulated_data_2017_filtered[LO_simulated_data_2017_filtered["Month"].isin([1,2,3,4,5])]
 
@@ -292,12 +292,20 @@ plt.legend(["1:1 line"])
 
 LO_2017_scatter_fig.savefig("./figs/LO_2017_compare_scatter_fig.png", dpi = 400)
 
-# this adjustment didn't really change much? Figures look the same?
+# this adjustment didn't really change much? Figures look the same? I think the figure looks 
+# very similar b/c I only forced QM 1 of Jan 2017 to be the same as the historic,
+# and nothing beyond that. So averaging to monthly means basically doesn't guarantee that
+# the points will fall on the 1:1 line
 
-# plot the time series for 2017 data, simulated (both initializations), and observed 
-# COME BACK HERE - MESSED UP TIME SERIES PLOT
+# ------------------------------------------------------------------------------------------------
+# TIME SERIES ANALYSIS (1):
+# Lake Ontario Comparisons with 2 initializations of the simulated data, and historic 
+# ------------------------------------------------------------------------------------------------
 
-LO_historic_wtlvl_2017 = LO_historic_wtlvl[LO_historic_wtlvl["Year"].isin([2016, 2017])] # historical wt lvls for 2017 only
+# Plot the time series for 2017 data, simulated (both initializations), and observed 
+# COME BACK HERE - FIX TIME SERIES PLOT TO SHOW MONTHLY MEANS 
+
+LO_historic_wtlvl_2017 = LO_historic_wtlvl[LO_historic_wtlvl["Year"].isin([2016, 2017])] # historical wt lvls for 2016 and 2017 only
 
 #month_to_str_hist = {
     #1: " Jan", 2: " Feb", 3:" Mar", 4:" Apr",
@@ -307,7 +315,7 @@ LO_historic_wtlvl_2017 = LO_historic_wtlvl[LO_historic_wtlvl["Year"].isin([2016,
 
 #LO_historic_wtlvl_2017['month2'] = LO_historic_wtlvl_2017['month'].map(month_to_str_hist)
 
-
+# 2017 initialization - filter to 2016 and 2017
 LO_simulated_data_2017_filtered = LO_simulated_data_2017[LO_simulated_data_2017["Year"].isin([2016, 2017])]
 #LO_simulated_data_2017_filtered_agg = LO_simulated_data_2017_filtered.groupby(["Year", "Month"]).mean("ontLevel").reset_index()
 #LO_simulated_data_2017_filtered_agg["Date"] = pd.to_datetime(LO_simulated_data_2017_filtered_agg[["Year", "Month"]].assign(DAY=1))
@@ -330,7 +338,7 @@ LO_simulated_data_2017_filtered = LO_simulated_data_2017[LO_simulated_data_2017[
 #LO_simulated_data_16_17_filtered_agg = pd.concat([LO_simulated_data_2016_filtered_agg, LO_simulated_data_2017_filtered_agg])
 
 
-
+# 1900 initialization - filter to 2016 and 2017
 LO_simulated_data_filtered = LO_simulated_data[LO_simulated_data["Year"].isin([2016, 2017])]
 #LO_simulated_data_filtered_agg = LO_simulated_data_filtered.groupby(["Year", "Month"]).mean("ontLevel").reset_index()
 #LO_simulated_data_filtered_agg["Date"] = pd.to_datetime(LO_simulated_data_filtered_agg[["Year", "Month"]].assign(DAY=1))
@@ -338,26 +346,29 @@ LO_simulated_data_filtered = LO_simulated_data[LO_simulated_data["Year"].isin([2
 #LO_simulated_data_filtered_agg['month'] = LO_simulated_data_filtered_agg['Month'].map(month_to_str)
 
 
-
-# Plot LO historic, and 2 versions of simulated for 2017 all as time series on same plot 
+# Plot LO historic, and 2 versions of simulated for 2016 and 2017 
+# all as time series on same plot 
 LO_time_series_fig = plt.figure(figsize = (9,5))
 
+# monthly averages - historic
 plt.plot(LO_historic_wtlvl_2017["Date"], LO_historic_wtlvl_2017["wt_lvl__m"], c = "k")
 plt.scatter(LO_historic_wtlvl_2017["Date"], LO_historic_wtlvl_2017["wt_lvl__m"], s = 1, 
             c="k", label='_nolegend_')
 
 # simulated water levels, initialized with 1900 conditions (removed "agg")
+# unit of obs = QM
 plt.plot(LO_simulated_data_filtered["Date"], LO_simulated_data_filtered["ontLevel"], c = "blue")
 plt.scatter(LO_simulated_data_filtered["Date"], LO_simulated_data_filtered["ontLevel"], 
             s = 1, c="blue", label='_nolegend_')
 
 # simulated water levels, initialized with 2017 conditions (removed "agg")
+# unit of obs = QM
 plt.plot(LO_simulated_data_2017_filtered["Date"], LO_simulated_data_2017_filtered["ontLevel"], c = "red")
 plt.scatter(LO_simulated_data_2017_filtered["Date"], LO_simulated_data_2017_filtered["ontLevel"], 
             s = 1, c="red", label='_nolegend_')
 
 plt.ylabel("Water level (m)")
-LO_time_series_fig.suptitle("Lake Ontario Simulated and Observed Water Levels (2017)")
+LO_time_series_fig.suptitle("Lake Ontario Simulated and Observed Water Levels (2016-2017)")
 plt.title("Red and blue lines differ by the simulation model's initial conditions (1900 or 2017)", fontsize = 7)
 plt.legend(["historic", "1900 simulated", "2017 simulated"], 
            loc = "upper right", 
@@ -368,6 +379,132 @@ v_pos = dt.datetime(2017, 5, 24) # Last week of May, 2017
 plt.axvline(x = v_pos, color = "red", linestyle = "--")
 
 LO_time_series_fig.savefig("./figs/LO_time_series_fig.png", dpi = 400)
+
+# ------------------------------------------------------------------------------------------------
+# TIME SERIES ANALYSIS (2):
+# Lake Ontario Comparisons with 2 initializations of the simulated data, and historic 
+# Aggregate the date to mean monthly as opposed to dates
+# ------------------------------------------------------------------------------------------------
+
+# aggregate the simulated (quarter-monthly) data to month before plotting 
+# just average the first 4 quarter months and call that Jan, the next 4 call Feb...
+
+# aggregate the simulated (2017 initialized)
+
+LO_simulated_data_2017_filtered_month = LO_simulated_data_2017_filtered.groupby(LO_simulated_data_2017_filtered.index // 4).agg({
+    'ontLevel': 'mean',
+    'Year': 'first',  # Retain the first year value for each group
+    'Month': 'first'  # Retain the first month value for each group
+}).reset_index()
+
+# add a string month column 
+month_to_str = {
+    1: " Jan", 2: " Feb", 3: " Mar", 4: " Apr",
+    5: " May", 6: " Jun", 7: " Jul", 8: " Aug",
+    9: " Sep", 10:" Oct", 11:" Nov", 12:" Dec"
+} # add a space to each str to match w/ the historic 
+
+LO_simulated_data_2017_filtered_month['month'] = LO_simulated_data_2017_filtered_month['Month'].map(month_to_str)
+
+# repeat above steps to aggregate the simulated data (1900 initialized)
+LO_simulated_data_filtered_month = LO_simulated_data_filtered.groupby(LO_simulated_data_filtered.index // 4).agg({
+    'ontLevel': 'mean',
+    'Year': 'first',  # Retain the first year value for each group
+    'Month': 'first'  # Retain the first month value for each group
+}).reset_index()
+
+# add a str month column
+LO_simulated_data_filtered_month['month'] = LO_simulated_data_filtered_month['Month'].map(month_to_str)
+
+# plot the aggregated time series 
+LO_time_series_fig_agg = plt.figure(figsize = (9,5))
+
+# monthly averages - historic
+plt.plot(LO_historic_wtlvl_2017["Month"], LO_historic_wtlvl_2017["wt_lvl__m"], c = "k")
+plt.scatter(LO_historic_wtlvl_2017["Month"], LO_historic_wtlvl_2017["wt_lvl__m"], s = 1, 
+            c="k", label='_nolegend_')
+
+# simulated water levels, initialized with 1900 conditions 
+# unit of obs = QM
+plt.plot(LO_simulated_data_filtered_month["month"], LO_simulated_data_filtered_month["ontLevel"], c = "blue")
+plt.scatter(LO_simulated_data_filtered_month["month"], LO_simulated_data_filtered_month["ontLevel"], 
+            s = 1, c="blue", label='_nolegend_')
+
+# simulated water levels, initialized with 2017 conditions (removed "agg")
+# unit of obs = QM
+plt.plot(LO_simulated_data_2017_filtered_month["month"], LO_simulated_data_2017_filtered_month["ontLevel"], c = "red")
+plt.scatter(LO_simulated_data_2017_filtered_month["month"], LO_simulated_data_2017_filtered_month["ontLevel"], 
+            s = 1, c="red", label='_nolegend_')
+
+plt.ylabel("Water level (m)")
+LO_time_series_fig_agg.suptitle("Lake Ontario Simulated and Observed Water Levels (2016-2017)")
+plt.title("Red and blue lines differ by the simulation model's initial conditions (1900 or 2017)", fontsize = 7)
+plt.legend(["historic", "1900 simulated", "2017 simulated"], 
+           loc = "upper right", 
+           fontsize = 7)
+#plt.ylim(73.5, 76.0)
+# add vertical line for last week of May; after this line is when Board deviations occurred
+#v_pos = dt.datetime(2017, 5, 24) # Last week of May, 2017
+#plt.axvline(x = v_pos, color = "red", linestyle = "--")
+
+LO_time_series_fig_agg.savefig("./figs/LO_time_series_fig_agg.png", dpi = 400)
+
+
+# UPDATED TIME SERIES FIG - USE THIS FIG!!!!!
+
+# Create a new column combining year and month
+LO_simulated_data_filtered_month['date'] = LO_simulated_data_filtered_month['Year'].astype(str) + '-' + LO_simulated_data_filtered_month['month']
+LO_simulated_data_2017_filtered_month['date'] = LO_simulated_data_2017_filtered_month['Year'].astype(str) + '-' + LO_simulated_data_2017_filtered_month['month']
+LO_historic_wtlvl_2017['date'] = LO_historic_wtlvl_2017['Year'].astype(str) + '-' + LO_historic_wtlvl_2017['Month']
+
+# remove the space in the sixth position of each date string
+LO_simulated_data_filtered_month['date'] = LO_simulated_data_filtered_month['date'].apply(lambda x: x[:5] + x[6:] if len(x) >= 6 else x)
+LO_simulated_data_2017_filtered_month['date'] = LO_simulated_data_2017_filtered_month['date'].apply(lambda x: x[:5] + x[6:] if len(x) >= 6 else x)
+LO_historic_wtlvl_2017['date'] = LO_historic_wtlvl_2017['date'].apply(lambda x: x[:5] + x[6:] if len(x) >= 6 else x)
+
+# need to fix december 2016 and 2017 in historic data set...remove last space for these vals
+LO_historic_wtlvl_2017['date'].iloc[11] = LO_historic_wtlvl_2017['date'].iloc[11][:-1]
+LO_historic_wtlvl_2017['date'].iloc[23] = LO_historic_wtlvl_2017['date'].iloc[23][:-1]
+
+# Create the figure
+LO_time_series_fig_agg = plt.figure(figsize=(9, 5))
+
+# Plot the data
+plt.plot(LO_historic_wtlvl_2017["date"], LO_historic_wtlvl_2017["wt_lvl__m"], c="k")
+    
+plt.scatter(LO_historic_wtlvl_2017["date"], LO_historic_wtlvl_2017["wt_lvl__m"], s=5, c="k", label='_nolegend_')
+
+plt.plot(LO_simulated_data_filtered_month["date"], LO_simulated_data_filtered_month["ontLevel"], c="blue")
+plt.scatter(LO_simulated_data_filtered_month["date"], LO_simulated_data_filtered_month["ontLevel"], s=5, c="blue", label='_nolegend_')
+
+plt.plot(LO_simulated_data_2017_filtered_month["date"], LO_simulated_data_2017_filtered_month["ontLevel"], c="red")
+plt.scatter(LO_simulated_data_2017_filtered_month["date"], LO_simulated_data_2017_filtered_month["ontLevel"], s=5, c="red", label='_nolegend_')
+
+plt.ylabel("Mean Monthly Water Level (m)")
+LO_time_series_fig_agg.suptitle("Lake Ontario Simulated and Observed Water Levels (2016-2017)")
+plt.title("Red and blue lines differ by the simulation model's initial conditions (1900 or 2017)\nVertical red dashed line is May 2017, after which the Board began deviating from Plan 2014", fontsize = 7)
+plt.legend(["historic", "1900 simulated", "2017 simulated"], loc="upper right", fontsize=7)
+
+# adjust size of x labels
+plt.xticks(fontsize = 7, rotation = 270)
+
+# add a vertical line for the last week of May, when the Board started deviating from plan
+x_labels = ["2016-Jan", "2016-Feb", "2016-Mar", "2016-Apr", "2016-May", 
+            "2016-Jun", "2016-Jul", "2016-Aug", "2016-Sep", "2016-Oct", "2016-Nov",
+            "2016-Dec", "2017-Jan", "2017-Feb", "2017-Mar", "2017-Apr",
+            "2017-May", "2017-Jun", "2017-Jul", "2017-Aug", "2017-Sep",
+            "2017-Oct", "2017-Nov", "2017-Dec"]
+
+target_index = x_labels.index("2017-May")
+plt.axvline(x=target_index, color='r', linestyle='--', label="Vertical Line at 2017-May")
+
+# Save the figure
+LO_time_series_fig_agg.savefig("./figs/LO_time_series_fig_agg.png", dpi=400)
+
+# note, I don't think the black and red lines will line up perfectly in 2016 b/c 
+# I used the linearly interpolated data for the red line and aggregated
+# to mean monthly based off of that, so there will be slight discrepancies
+# b/w the red and black lines for the year 2016. 
 
 # ------------------------------------------------------------------------------------------------
 # MODEL DIAGNOSTIC ASSESSMENT: COMPARE OBSERVED AND SIMULATED VIA SCATTER PLOTS [2017 only]
@@ -383,9 +520,11 @@ abay_historic_wtlvl["Month"] = [abay_historic_wtlvl["dates"][row][6] for row in 
 abay_historic_wtlvl_mean = abay_historic_wtlvl.groupby("Month").mean("wt_lvl__m").reset_index()
 
 # filter the LO simulated data frame to just Jan - May 2017 (I overwrote this)
+LO_simulated_data_2017_filtered = LO_simulated_data_2017[LO_simulated_data_2017["Year"] == 2017]
 LO_simulated_data_2017_filtered = LO_simulated_data_2017_filtered[LO_simulated_data_2017_filtered["Month"].isin([1,2,3,4,5])]
 
 # aggregate the LO simulated Jan - May 2017 data to monthly averages for A Bay
+# note this is using the model output adjusted for 2017 initial conditions 
 abay_simulated_data_2017_filtered_agg = LO_simulated_data_2017_filtered.groupby("Month").mean("alexbayLevel").reset_index()
 
 # plot
@@ -410,9 +549,8 @@ plt.legend(["1:1 line"])
 abay_scatter_fig.savefig("./figs/abay_compare_scatter_fig.png", dpi = 400)
  
 # The A Bay simulated and observed scatter plot where the simulation was initialized
-# with the Plan 2014 default conditons (1900) seems to have a fine correspondance
-# b/w simulated and observed data...so no need to replicate this plot with the 
-# 2017 initial conditions?
+# with 2017 conditions seems to have a fine correspondance
+# b/w simulated and observed data...so no need to keep iterating on this? 
 
 # ------------------------------------------------------------------------------------------------
 # MODEL DIAGNOSTIC ASSESSMENT: COMPARE OBSERVED AND SIMULATED VIA SCATTER PLOTS [2017 only]
@@ -450,6 +588,9 @@ plt.title("Ogdensburg simulated and observed mean monthly water levels (Jan - Ma
 plt.legend(["1:1 line"])
 
 ogdensburg_scatter_fig.savefig("./figs/ogdensburg_compare_scatter_fig.png", dpi = 400)
+
+# February is a bit high for simulated at Ogdensburg, using 2017 initial conditions
+# for the simulated data 
 
 # ------------------------------------------------------------------------------------------------
 # MODEL DIAGNOSTIC ASSESSMENT: COMPARE OBSERVED AND SIMULATED VIA SCATTER PLOTS [2017 only]
@@ -489,4 +630,5 @@ plt.legend(["1:1 line"])
 
 pointeClaire_scatter_fig.savefig("./figs/pointeClaire_compare_scatter_fig.png", dpi = 400)
 
-# February and March do not line up for the pointe claire figure...
+# February and March do not fall on the 1:1 line for Pointe Claire, even 
+# using the 2017 initialized water levels for the simulated data 
