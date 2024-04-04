@@ -110,7 +110,8 @@ for f in range(startf, len(filelist)):
         
         # CMS edit: Manually add in 2016 observed water level data to "data"
         # so the short and long term forecasts can spin up on 2016 data 
-        data_2016 = pd.read_csv("../data/historic/cleaned/LakeOntario_QM_lin_interp_2016.csv")
+        # this is the linear interpolated beginning of month LO data!
+        data_2016 = pd.read_csv("../data/historic/cleaned/LakeOntario_QM_lin_interp_2016_v2.csv")
         data = pd.merge(data, data_2016, on = ["Year", "Month", "QM"], how = "outer")
         
         data['ontLevel'] = data['ontLevel_x'].combine_first(data['ontLevel_y'])
@@ -127,7 +128,7 @@ for f in range(startf, len(filelist)):
 
         # set start iteration at index for QM 2017 to run the model
         # at 2017 observed conditions 
-        s = 5617
+        s = 5616 # 5617 or 5616?
 
         # 2970 cms-quarters is the conversion factor for converting flows to levels
         conv = 2970
@@ -138,7 +139,7 @@ for f in range(startf, len(filelist)):
 
         sim_st = datetime.now()
 
-        for t in range(s, timesteps - 48): # range of the data length df
+        for t in range(s, timesteps): # range of the data length df
 
             # quarter month
             qm = data["QM"][t]
@@ -930,7 +931,7 @@ for f in range(startf, len(filelist)):
             + str(skill)
             + "/"
             + fn
-            + "/S_2017_2_"
+            + "/S_2017_3_"
             + str(p + 1)
             + ".txt",
             sep="\t",
