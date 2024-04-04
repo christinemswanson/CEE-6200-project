@@ -30,15 +30,19 @@ LO_historic_wtlvl = LO_historic_wtlvl.iloc[:, 1:5] # remove repeated index colum
 
 # add YY-MM column
 LO_historic_wtlvl["Date"] = pd.to_datetime(LO_historic_wtlvl[["Year", "month"]].assign(DAY=1)) # note,
-# days are meaningless here: the unit of observation is only YY-MM, not day
+# Days are good b/c I pulled beginning of month LO historical data
 
-# Alexandria Bay
+# Alexandria Bay (2017 historic)
 abay_historic_wtlvl = pd.read_csv("./data/historic/cleaned/abay_wtlvl_cleaned.csv")
 abay_historic_wtlvl = abay_historic_wtlvl.iloc[:, 1:4] # remove repeated index colum
 abay_dates = [date[:10] for date in abay_historic_wtlvl["date"]] # extract YY-MM-DD from "date"
 abay_historic_wtlvl["dates"] = abay_dates # append the new dates column for plotting 
 
-# Ogdensburg
+# Alexandria Bay (full historic: June 30th 1983 - Dec 31st 2020)
+abay_full_historic_wtlvl = pd.read_csv("./data/historic/cleaned/abay_full_daily_mean_wtlvl_NOAA.csv").dropna()
+# MAKE THE DATE COLUMN INTO A PANDAS DATE DATA TYPE
+
+# Ogdensburg (2017 historic)
 ogdensburg_historic_wtlvl = pd.read_csv("./data/historic/cleaned/ogdensburg_wtlvl_cleaned.csv")
 ogdensburg_historic_wtlvl = ogdensburg_historic_wtlvl.iloc[:, 1:4]
 ogdensburg_dates = [date[:10] for date in ogdensburg_historic_wtlvl["date"]] # extract YY-MM-DD from "date"
@@ -81,8 +85,9 @@ LO_simulated_data["Date"] = pd.to_datetime(LO_simulated_data[["Year", "Month", "
 
 # load simulated water levels along SLR and LO, simulated just for 2017
 # I.e., initial condition set to *2017 historical water levels*
+# This was run w/ the LO observed 2016 data, for beginning of month
 
-LO_simulated_data_2017 = pd.read_table("./simulation/output/historic/full/sq/historic/S_2017_2_1.txt")
+LO_simulated_data_2017 = pd.read_table("./simulation/output/historic/full/sq/historic/S_2017_3_1.txt")
 LO_simulated_data_2017["Day"] = LO_simulated_data_2017["QM"].map(quarter_month_to_days)
 LO_simulated_data_2017["Date"] = pd.to_datetime(LO_simulated_data_2017[["Year", "Month", "Day"]]) # note,
 # days are meaningless here: the unit of observation is only YY-MM, not day
@@ -303,7 +308,8 @@ LO_2017_scatter_fig.savefig("./figs/LO_2017_compare_scatter_fig.png", dpi = 400)
 # ------------------------------------------------------------------------------------------------
 
 # Plot the time series for 2017 data, simulated (both initializations), and observed 
-# COME BACK HERE - FIX TIME SERIES PLOT TO SHOW MONTHLY MEANS 
+# USE THIS PLOT IN FINAL PROJECT!!!!!!
+# red and black lines are close, which is good!
 
 LO_historic_wtlvl_2017 = LO_historic_wtlvl[LO_historic_wtlvl["Year"].isin([2016, 2017])] # historical wt lvls for 2016 and 2017 only
 
@@ -348,31 +354,38 @@ LO_simulated_data_filtered = LO_simulated_data[LO_simulated_data["Year"].isin([2
 
 # Plot LO historic, and 2 versions of simulated for 2016 and 2017 
 # all as time series on same plot 
-LO_time_series_fig = plt.figure(figsize = (9,5))
-
-# monthly averages - historic
-plt.plot(LO_historic_wtlvl_2017["Date"], LO_historic_wtlvl_2017["wt_lvl__m"], c = "k")
-plt.scatter(LO_historic_wtlvl_2017["Date"], LO_historic_wtlvl_2017["wt_lvl__m"], s = 1, 
-            c="k", label='_nolegend_')
+LO_time_series_fig = plt.figure(figsize = (12,7.5))
 
 # simulated water levels, initialized with 1900 conditions (removed "agg")
 # unit of obs = QM
 plt.plot(LO_simulated_data_filtered["Date"], LO_simulated_data_filtered["ontLevel"], c = "blue")
 plt.scatter(LO_simulated_data_filtered["Date"], LO_simulated_data_filtered["ontLevel"], 
-            s = 1, c="blue", label='_nolegend_')
+            s = 3, c="blue", label='_nolegend_')
 
 # simulated water levels, initialized with 2017 conditions (removed "agg")
 # unit of obs = QM
 plt.plot(LO_simulated_data_2017_filtered["Date"], LO_simulated_data_2017_filtered["ontLevel"], c = "red")
 plt.scatter(LO_simulated_data_2017_filtered["Date"], LO_simulated_data_2017_filtered["ontLevel"], 
-            s = 1, c="red", label='_nolegend_')
+            s = 3, c="red", label='_nolegend_')
+
+# monthly averages - historic
+plt.plot(LO_historic_wtlvl_2017["Date"], LO_historic_wtlvl_2017["wt_lvl__m"],
+         c = "k", linestyle = "--") # plot as a dashed line 
+# b/c you can't compare the line segments of the historic to the simulated data
+# because the unit of observation of the dates are mismatched (historic is 
+# beginning of month, whereas simulated is end of quarter month)
+plt.scatter(LO_historic_wtlvl_2017["Date"], LO_historic_wtlvl_2017["wt_lvl__m"], s = 15, 
+            c="k", zorder = 5)
 
 plt.ylabel("Water level (m)")
-LO_time_series_fig.suptitle("Lake Ontario Simulated and Observed Water Levels (2016-2017)")
-plt.title("Red and blue lines differ by the simulation model's initial conditions (1900 or 2017)", fontsize = 7)
-plt.legend(["historic", "1900 simulated", "2017 simulated"], 
+plt.title("Lake Ontario Simulated and Observed Water Levels (2016-2017)")
+#plt.title("Red and blue lines differ by the simulation model's initial conditions (1900 or 2017)\nVertical red dashed line is the last week of May 2017, after which the Board began deviating from Plan 2014", fontsize = 7)
+plt.legend(["1900 simulated", "2017 simulated", "historic"], 
            loc = "upper right", 
-           fontsize = 7)
+           fontsize = 12)
+plt.xlabel('''Date (YYYY-MM)
+           
+Red and blue lines differ by the simulation model's initial conditions (1900 or 2017).\nVertical red dashed line is the last week of May 2017, after which the Board began deviating from Plan 2014.''')
 #plt.ylim(73.5, 76.0)
 # add vertical line for last week of May; after this line is when Board deviations occurred
 v_pos = dt.datetime(2017, 5, 24) # Last week of May, 2017
