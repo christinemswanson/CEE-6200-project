@@ -15,31 +15,32 @@ import pandas as pd
 import os
 
 # set wd
-wd = "C:/Users/cms549/Box/classwork/2024_Spring/CEE6200/finalProject/py-scripts" 
+#wd = "C:/Users/cms549/Box/classwork/2024_Spring/CEE6200/finalProject/py-scripts" 
+wd = "C:/Users/cms549/Desktop/GitHub/CEE-6200-project/finalProject" 
 os.chdir(wd)
 
 # load csv files 
 
-# LO historical mean monthly water levels from 1918 to 2024 [units: meters]
+# LO historical beginning of month water levels from 1918 to 2024 [units: meters]
 # data source: greatlakescc.org
 # datum: IGLD 1985 
-LO_historic_wtlvl = pd.read_csv("../data/historic/LakeOntario_MonthlyMeanWaterLevels_1918to2024.csv",
+LO_historic_wtlvl = pd.read_csv("./data/historic/LakeOntario_BeginningOfMonthWaterLevels_1900to2024.csv",
                                 skiprows = 9)
 
 # Ogdensburg historical daily average water levels from Jan - May 2017 [units: meters]
 # data source: NOAA Tides and Currents
 # datum: IGLD 1985 
-ogdensburg_historic_daily_wtlvl = pd.read_csv("../data/historic/ogdensburg_daily_mean_wtlvl_NOAA.csv")
+ogdensburg_historic_daily_wtlvl = pd.read_csv("./data/historic/ogdensburg_daily_mean_wtlvl_NOAA.csv")
 
 # Alexandria Bay historical daily water levels from Jan - May 2017 [units: meters]
 # data source: NOAA Tides and Currents
 # datum: IGLD 1985 
-abay_historic_daily_wtlvl = pd.read_csv("../data/historic/abay_daily_mean_wtlvl_NOAA.csv")
+abay_historic_daily_wtlvl = pd.read_csv("./data/historic/abay_daily_mean_wtlvl_NOAA.csv")
 
 # Pointe Claire historical daily water levels from 1915 to 2022 [units: meters]
 # data source: Environment Canada Historical Hydrometric Data
 # datum: IGLD 1985
-pointClaire_historic_daily_wtlvl = pd.read_csv("../data/historic/pointe_claire_02OA039_wtlvls__m_EnvCanada.csv",
+pointClaire_historic_daily_wtlvl = pd.read_csv("./data/historic/pointe_claire_02OA039_wtlvls__m_EnvCanada.csv",
                                                skiprows = 1)
 
 # LO df cleaned
@@ -69,8 +70,8 @@ LO_historic_wtlvl = LO_historic_wtlvl.sort_values(["Year", "month"])
 # reset the index of the df
 LO_historic_wtlvl = LO_historic_wtlvl.reset_index(drop = True) # cleaned df, ready to use
 
-# select LO df dates from 1918 to 2021 (to match closely to sim model output for LO levels)
-LO_historic_wtlvl = LO_historic_wtlvl.iloc[0:1236,:]
+# select LO df dates from 1900 to 2021 (to match closely to sim model output for LO levels)
+LO_historic_wtlvl = LO_historic_wtlvl.iloc[0:len(LO_historic_wtlvl)-48,:]
 
 # --------------------------------------------------------------------------
 
