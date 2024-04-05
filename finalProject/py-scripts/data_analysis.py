@@ -817,3 +817,88 @@ abay_full_scatter_fig.savefig("./figs/abay_full_scatter_fig.png", dpi = 400)
 
 pointeClaire_historic_wtlvl = pointeClaire_historic_wtlvl.dropna()
 
+# COME BACK TO THIS SECTION IF TIME!
+
+# ------------------------------------------------------------------------------------------------
+# MODEL DIAGNOSTIC ASSESSMENT (2): COMPARE OBSERVED AND SIMULATED VIA SCATTER PLOTS [post-2017]
+# Lake Ontario Comparison
+# ------------------------------------------------------------------------------------------------
+
+# Extract the LAST QM of each month so you can make the best approximate 
+# comparison to the LO historical water levels in the next month (which are beginning of month)
+# That is, QM4 (day ~ 28) in simulated data in the current month is close to the first day 
+# of the NEXT month in the historical data (day = 1)
+
+# first, filter the LO_simulated_data to pre-2017
+LO_simulated_data_post_2017 = LO_simulated_data[(LO_simulated_data["Year"] > 2017) & (LO_simulated_data["Year"] < 2020)]
+
+# filter historic to pre-2017
+LO_historic_wtlvl_post_2017 = LO_historic_wtlvl[(LO_historic_wtlvl["Year"] > 2017) & (LO_historic_wtlvl["Year"] < 2020)]
+
+# Select the last quarter month (fourth row in each group) in simulated
+LO_simulated_data_last_QM_post2017 = LO_simulated_data_post_2017["ontLevel"][3::4]
+
+# Reset the index
+LO_simulated_data_last_QM_post2017 = LO_simulated_data_last_QM_post2017.reset_index(drop=True)
+
+# Convert to df
+LO_simulated_data_last_QM_post2017 = pd.DataFrame(LO_simulated_data_last_QM_post2017)
+
+# scatter plot of last QM of each month (LO simulated) and 
+# LO historic (beginning of month)
+
+LO_full_scatter_fig_post2017, ax = plt.subplots(figsize = (10,7))
+plt.scatter(LO_simulated_data_last_QM_post2017["ontLevel"], LO_historic_wtlvl_post_2017["wt_lvl__m"], 
+            color = "k", label='_nolegend_', s = 4)
+plt.xlabel("Simulated water level (m)")
+
+plt.ylabel("Observed water level (m)")
+
+# add 1:1 line 
+line = mlines.Line2D([0, 1], [0, 1], color='red')
+transform = ax.transAxes
+line.set_transform(transform)
+ax.add_line(line)
+
+#plt.plot([74.4, 74.6, 74.8, 75, 75.2, 75.4, 75.6, 75.8, 76], [74.4, 74.6, 74.8, 75, 75.2, 75.4, 75.6, 75.8, 76], c = "blue")
+LO_full_scatter_fig_post2017.suptitle("Lake Ontario simulated and observed beginning of month water levels (2018-2019)",
+                             fontsize = 14)
+plt.title("The simulated data shown are the last quarter-month of each month (day ~ 28), whereas the historic data\nare the beginning of each month (day = 1)") 
+plt.legend(["1:1 line"], loc = "lower right")
+
+# Calculate R-squared
+r2 = r2_score(LO_simulated_data_last_QM_post2017["ontLevel"], LO_historic_wtlvl_post_2017["wt_lvl__m"])
+
+# Calculate RMSE
+rmse = mean_squared_error(LO_simulated_data_last_QM_post2017["ontLevel"], LO_historic_wtlvl_post_2017["wt_lvl__m"], squared=False)
+
+plt.annotate(f"R² = {r2:.3f}", (0.1, 0.9), xycoords='axes fraction')
+plt.annotate(f"RMSE = {rmse:.3f}", (0.1, 0.85), xycoords='axes fraction')
+
+LO_full_scatter_fig_post2017.savefig("./figs/LO_full_scatter_fig_post2017.png", dpi = 400)
+
+
+# plot the time series of the simulated and historic post-2017 for LO
+# too difficult to read this plot, so just use scatter plots? 
+
+LO_time_series_post2017_fig = plt.figure()
+plt.plot(LO_historic_wtlvl_post_2017["Date"], LO_historic_wtlvl_post_2017["wt_lvl__m"], 
+         c = "k", linewidth = 1, linestyle = "--")
+plt.scatter(LO_historic_wtlvl_post_2017["Date"], LO_historic_wtlvl_post_2017["wt_lvl__m"], 
+            s = 3, c="k", label='_nolegend_')
+
+plt.plot(LO_simulated_data_post_2017["Date"], LO_simulated_data_post_2017["ontLevel"], 
+         c = "red", linewidth = 1)
+plt.scatter(LO_simulated_data_post_2017["Date"], LO_simulated_data_post_2017["ontLevel"], 
+            s = 1, c="red", label='_nolegend_')
+
+plt.ylabel("Water level (m)")
+plt.xlabel("Date (YYYY-MM)")
+plt.xticks(fontsize = 7)
+
+LO_time_series_post2017_fig.suptitle("Lake Ontario Simulated and Observed Water Levels (2018 - 2019)")
+#plt.title("Datum: IGLD 1985", loc = "left", fontsize = 10)
+#plt.ylim(73.5, 76.0)
+plt.legend(["historic", "simulated"])
+
+LO_time_series_post2017_fig.savefig("./figs/LO_time_series_post2017_fig.png", dpi = 400)
