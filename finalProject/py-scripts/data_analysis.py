@@ -17,6 +17,7 @@ import datetime as dt
 import matplotlib.lines as mlines
 from sklearn.metrics import r2_score, mean_squared_error
 from scipy.stats import linregress
+from calendar import monthrange
 
 # set wd
 wd = "C:/Users/cms549/Desktop/GitHub/CEE-6200-project/finalProject" 
@@ -665,10 +666,10 @@ pointeClaire_scatter_fig.savefig("./figs/pointeClaire_compare_scatter_fig.png", 
 # Lake Ontario Comparison
 # ------------------------------------------------------------------------------------------------
 
-# Extract the first QM of each month so you can make the best approximate 
-# comparison to the LO historical water levels (which are beginning of month)
-# That is, QM1 (day ~ 7) in simulated data is close to the first day of the 
-# month in the historical data 
+# Extract the LAST QM of each month so you can make the best approximate 
+# comparison to the LO historical water levels in the next month (which are beginning of month)
+# That is, QM4 (day ~ 28) in simulated data in the current month is close to the first day 
+# of the NEXT month in the historical data (day = 1)
 
 # first, filter the LO_simulated_data to pre-2017
 LO_simulated_data_pre_2017 = LO_simulated_data[LO_simulated_data["Year"] < 2017]
@@ -676,20 +677,20 @@ LO_simulated_data_pre_2017 = LO_simulated_data[LO_simulated_data["Year"] < 2017]
 # filter historic to pre-2017
 LO_historic_wtlvl_pre_2017 = LO_historic_wtlvl[LO_historic_wtlvl["Year"] < 2017]
 
-# Pick from the LO simulated data the first QM of each month
-LO_simulated_data_first_QM = LO_simulated_data_pre_2017.groupby(['Year', 'Month'])
+# Select the last quarter month (fourth row in each group) in simulated
+LO_simulated_data_last_QM = LO_simulated_data_pre_2017["ontLevel"][3::4]
 
-# Select the first quarter month (first row in each group)
-LO_simulated_data_first_QM = LO_simulated_data_first_QM.first()
+# Reset the index
+LO_simulated_data_last_QM = LO_simulated_data_last_QM.reset_index(drop=True)
 
-# Combine the selected rows
-LO_simulated_data_first_QM = LO_simulated_data_first_QM.reset_index(drop=True)
+# Convert to df
+LO_simulated_data_last_QM = pd.DataFrame(LO_simulated_data_last_QM)
 
-# scatter plot of first QM of each month (LO simulated) and 
+# scatter plot of last QM of each month (LO simulated) and 
 # LO historic (beginning of month)
 
 LO_full_scatter_fig, ax = plt.subplots(figsize = (10,7))
-plt.scatter(LO_simulated_data_first_QM["ontLevel"], LO_historic_wtlvl_pre_2017["wt_lvl__m"], 
+plt.scatter(LO_simulated_data_last_QM["ontLevel"], LO_historic_wtlvl_pre_2017["wt_lvl__m"], 
             color = "k", label='_nolegend_', s = 4)
 plt.xlabel("Simulated water level (m)")
 
@@ -706,19 +707,113 @@ ax.add_line(line)
 #plt.plot([74.4, 74.6, 74.8, 75, 75.2, 75.4, 75.6, 75.8, 76], [74.4, 74.6, 74.8, 75, 75.2, 75.4, 75.6, 75.8, 76], c = "blue")
 LO_full_scatter_fig.suptitle("Lake Ontario simulated and observed beginning of month water levels (1900-2016)",
                              fontsize = 14)
-plt.title("The simulated data shown are the first quarter-month of each month (day ~ 7), whereas the historic data\nare the beginning of each month (day = 1)") 
+plt.title("The simulated data shown are the last quarter-month of each month (day ~ 28), whereas the historic data\nare the beginning of each month (day = 1)") 
 plt.legend(["1:1 line"], loc = "lower right")
 
 # Calculate R-squared
-r2 = r2_score(LO_simulated_data_first_QM["ontLevel"], LO_historic_wtlvl_pre_2017["wt_lvl__m"])
+r2 = r2_score(LO_simulated_data_last_QM["ontLevel"], LO_historic_wtlvl_pre_2017["wt_lvl__m"])
 
 # Calculate RMSE
-rmse = mean_squared_error(LO_simulated_data_first_QM["ontLevel"], LO_historic_wtlvl_pre_2017["wt_lvl__m"], squared=False)
+rmse = mean_squared_error(LO_simulated_data_last_QM["ontLevel"], LO_historic_wtlvl_pre_2017["wt_lvl__m"], squared=False)
 
 plt.annotate(f"R² = {r2:.3f}", (0.1, 0.9), xycoords='axes fraction')
 plt.annotate(f"RMSE = {rmse:.3f}", (0.1, 0.85), xycoords='axes fraction')
 
 LO_full_scatter_fig.savefig("./figs/LO_full_compare_scatter_fig.png", dpi = 400)
 
+# plot the time series of the simulated and historic pre-2017 for LO
+# too difficult to read this plot, so just use scatter plots 
 
+LO_time_series_pre2017_fig = plt.figure()
+plt.plot(LO_historic_wtlvl_pre_2017["Date"], LO_historic_wtlvl_pre_2017["wt_lvl__m"], 
+         c = "k", linewidth = 2)
+#plt.scatter(LO_historic_wtlvl_pre_2017["Date"], LO_historic_wtlvl_pre_2017["wt_lvl__m"], s = 1, c="k")
+
+plt.plot(LO_simulated_data_pre_2017["Date"], LO_simulated_data_pre_2017["ontLevel"], 
+         c = "red", linewidth = 0.5)
+#plt.scatter(LO_simulated_data_pre_2017["Date"], LO_simulated_data_pre_2017["ontLevel"], s = 1, c="blue")
+
+plt.ylabel("Water level (m)")
+LO_time_series_pre2017_fig.suptitle("Lake Ontario Simulated and Observed Water Levels (1900 - 2016)")
+#plt.title("Datum: IGLD 1985", loc = "left", fontsize = 10)
+#plt.ylim(73.5, 76.0)
+plt.legend(["historic", "simulated"])
+
+LO_time_series_pre2017_fig.savefig("./figs/LO_time_series_pre2017_fig.png", dpi = 400)
+
+# ------------------------------------------------------------------------------------------------
+# MODEL DIAGNOSTIC ASSESSMENT (2): COMPARE OBSERVED AND SIMULATED VIA SCATTER PLOTS [pre-2017]
+# A Bay Comparison
+# ------------------------------------------------------------------------------------------------
+
+# filter the A Bay historic data to 1984-2016
+abay_full_historic_wtlvl_filtered = abay_full_historic_wtlvl.iloc[185:12149].reset_index()
+
+# Extract the last day of each month from abay_full_historic_wtlvl_filtered
+
+# Get the last day of each month
+end_month_dates = []
+for date in abay_full_historic_wtlvl_filtered['date']:
+    year, month = date.year, date.month
+    day = monthrange(year, month)[1]
+    end_month_dates.append(pd.Timestamp(year, month, day))
+
+# Filter rows for the last day of each month
+abay_full_historic_wtlvl_filtered_last = abay_full_historic_wtlvl_filtered[abay_full_historic_wtlvl_filtered['date'].isin(end_month_dates)]
+
+# filter LO simulated data frame for last QM to 1985 - 2016
+# first, filter the LO_simulated_data to pre-2017 for A Bay
+LO_simulated_data_1984_2016 = LO_simulated_data[(LO_simulated_data["Year"] < 2017) & (LO_simulated_data["Year"] >= 1984)]
+
+# Select the last quarter month (fourth row in each group) in simulated
+LO_simulated_data_last_QM_1984_2016 = LO_simulated_data_1984_2016["alexbayLevel"][3::4]
+
+# drop the missing dates found in A Bay df (indices 4127, 4719, 4911)
+LO_simulated_data_last_QM_1984_2016 = LO_simulated_data_last_QM_1984_2016.drop(labels = [4127, 4719, 4911])
+
+# Reset the index
+LO_simulated_data_last_QM_1984_2016 = LO_simulated_data_last_QM_1984_2016.reset_index(drop=True)
+
+# Convert to df
+LO_simulated_data_last_QM_1984_2016 = pd.DataFrame(LO_simulated_data_last_QM_1984_2016)
+
+# plot
+abay_full_scatter_fig, ax = plt.subplots(figsize = (10,7))
+plt.scatter(LO_simulated_data_last_QM_1984_2016["alexbayLevel"], abay_full_historic_wtlvl_filtered_last["wt_lvl__m"], 
+            color = "k", label='_nolegend_', s = 4)
+plt.xlabel("Simulated water level (m)")
+
+plt.ylabel("Observed water level (m)")
+#plt.xlim(73.5, 76)
+#plt.ylim(73.5, 76)
+
+# add 1:1 line 
+line = mlines.Line2D([0, 1], [0, 1], color='red')
+transform = ax.transAxes
+line.set_transform(transform)
+ax.add_line(line)
+
+#plt.plot([74.4, 74.6, 74.8, 75, 75.2, 75.4, 75.6, 75.8, 76], [74.4, 74.6, 74.8, 75, 75.2, 75.4, 75.6, 75.8, 76], c = "blue")
+abay_full_scatter_fig.suptitle("Alexandria Bay simulated and observed beginning of month water levels (1984-2016)",
+                             fontsize = 14)
+plt.title("The simulated data shown are the last quarter-month of each month (day ~ 28), whereas the historic data\nare the beginning of each month (day = 1)") 
+plt.legend(["1:1 line"], loc = "lower right")
+
+# Calculate R-squared
+r2 = r2_score(LO_simulated_data_last_QM_1984_2016["alexbayLevel"], abay_full_historic_wtlvl_filtered_last["wt_lvl__m"])
+
+# Calculate RMSE
+rmse = mean_squared_error(LO_simulated_data_last_QM_1984_2016["alexbayLevel"], abay_full_historic_wtlvl_filtered_last["wt_lvl__m"], squared=False)
+
+plt.annotate(f"R² = {r2:.3f}", (0.1, 0.9), xycoords='axes fraction')
+plt.annotate(f"RMSE = {rmse:.3f}", (0.1, 0.85), xycoords='axes fraction')
+
+abay_full_scatter_fig.savefig("./figs/abay_full_scatter_fig.png", dpi = 400)
+
+# ------------------------------------------------------------------------------------------------
+# MODEL DIAGNOSTIC ASSESSMENT (2): COMPARE OBSERVED AND SIMULATED VIA SCATTER PLOTS [pre-2017]
+# Pointe Claire Comparison
+# ------------------------------------------------------------------------------------------------
+
+pointeClaire_historic_wtlvl = pointeClaire_historic_wtlvl.dropna()
 
