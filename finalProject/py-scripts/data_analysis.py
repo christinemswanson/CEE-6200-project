@@ -469,11 +469,6 @@ plt.axvline(x = v_pos, color = "red", linestyle = "--")
 abay_time_series_fig_2017.savefig("./figs/abay_time_series_fig_2017.png", dpi = 400)
 
 
-
-
-
-
-
 # ------------------------------------------------------------------------------------------------
 # TIME SERIES ANALYSIS (2):
 # Lake Ontario Comparisons with 2 initializations of the simulated data, and historic 
@@ -952,7 +947,6 @@ abay_full_scatter_fig_post2017.savefig("./figs/abay_full_scatter_fig_post2017.pn
 
 pointeClaire_historic_wtlvl = pointeClaire_historic_wtlvl.dropna()
 
-
 # COME BACK TO THIS SECTION IF TIME!!!!!!!!!
 
 # ------------------------------------------------------------------------------------------------
@@ -1060,3 +1054,148 @@ LO_time_series_post2017_fig.suptitle("Lake Ontario Simulated and Observed Water 
 plt.legend(["historic", "1900 simulated"])
 
 LO_time_series_post2017_fig.savefig("./figs/LO_time_series_post2017_fig.png", dpi = 400)
+
+# ------------------------------------------------------------------------------------------------
+# TIME SERIES ANALYSIS (2): COMPARE OBSERVED AND SIMULATED [post-2017]
+# ALEXANDRIA BAY COMPARISON
+# ------------------------------------------------------------------------------------------------
+
+abay_time_series_post2017_fig = plt.figure()
+
+plt.scatter(abay_full_historic_wtlvl_post_2017["date"], abay_full_historic_wtlvl_post_2017["wt_lvl__m"], 
+            s = 3, c="k")
+
+# 2017 initialized 
+#plt.plot(LO_simulated_data_2017_post2017["Date"], LO_simulated_data_2017_post2017["ontLevel"], 
+         #c = "red", linewidth = 1)
+#plt.scatter(LO_simulated_data_2017_post2017["Date"], LO_simulated_data_2017_post2017["ontLevel"], 
+            #s = 1, c="red", label='_nolegend_')
+
+# just plot 1900 initialized, b/c 2017 initialized is the same into 2018
+plt.plot(LO_simulated_data_post_2017["Date"], LO_simulated_data_post_2017["alexbayLevel"], 
+         c = "blue", linewidth = 1)
+plt.scatter(LO_simulated_data_post_2017["Date"], LO_simulated_data_post_2017["alexbayLevel"], 
+            s = 1, c="blue", label='_nolegend_')
+
+plt.ylabel("Water level (m)")
+plt.xlabel("Date (YYYY-MM)")
+plt.xticks(fontsize = 7)
+
+abay_time_series_post2017_fig.suptitle("Alexandria Bay Simulated and Observed Water Levels (2018 - 2019)")
+#plt.title("Datum: IGLD 1985", loc = "left", fontsize = 10)
+#plt.ylim(73.5, 76.0)
+plt.legend(["historic", "1900 simulated"])
+
+abay_time_series_post2017_fig.savefig("./figs/abay_time_series_post2017_fig.png", dpi = 400)
+
+# ------------------------------------------------------------------------------------------------
+# TIME SERIES ANALYSIS (2): COMPARE OBSERVED AND SIMULATED [pre-2017]
+# POINTE CLAIRE COMPARISON
+# ------------------------------------------------------------------------------------------------
+
+# only plot the 1900 simulated data and historical for pt. claire through 2016
+pointeClaire_historic_wtlvl_pre2016 = pointeClaire_historic_wtlvl[pointeClaire_historic_wtlvl["YEAR"] < 2017]
+
+# Pointe Claire historic and simulated [1915/1900 - 2016]
+pointeClaire_pre2017_fig = plt.figure()
+
+plt.plot(pointeClaire_historic_wtlvl_pre2016["Date"], pointeClaire_historic_wtlvl_pre2016["wt_lvl__m"], 
+         c = "k", linewidth = 2)
+plt.plot(LO_simulated_data_pre_2017["Date"], LO_simulated_data_pre_2017["ptclaireLevel"], 
+         c = "red", linewidth = 0.5)
+
+plt.ylabel("Water level (m)")
+#plt.xlabel("Date")
+#plt.xticks(np.arange(0, 151, step=20), rotation = 0, fontsize = 6)
+pointeClaire_pre2017_fig.suptitle("Pointe Claire simulated and observed water levels (1915 - 2016)")
+plt.title("Datum: IGLD 1985", loc = "left", fontsize = 10)
+plt.legend(["historic", "simulated"])
+
+pointeClaire_pre2017_fig.savefig("./figs/pointeClaire_pre2017_fig.png", dpi = 400)
+
+# ------------------------------------------------------------------------------------------------
+# TIME SERIES ANALYSIS (2): COMPARE OBSERVED AND SIMULATED [during 2016 and 2017]
+# POINTE CLAIRE COMPARISON
+# ------------------------------------------------------------------------------------------------
+
+# first, filter the Pointe Claire historical water levels to 2016 - 2017 
+
+pointeClaire_historic_wtlvl_filtered_2016_2017 = pointeClaire_historic_wtlvl[pointeClaire_historic_wtlvl["YEAR"].isin([2016, 2017])]
+
+# plot
+ptclaire_time_series_fig_2017 = plt.figure(figsize = (12,7.5))
+# 1900 initialized simulated data at pt claire 
+plt.plot(LO_simulated_data_filtered["Date"], LO_simulated_data_filtered["ptclaireLevel"], c = "blue")
+plt.scatter(LO_simulated_data_filtered["Date"], LO_simulated_data_filtered["ptclaireLevel"], 
+            s = 3, c="blue", label='_nolegend_')
+
+# 2016 initialized data at pt claire 
+plt.plot(LO_simulated_data_2017_filtered1["Date"], LO_simulated_data_2017_filtered1["ptclaireLevel"], c = "red")
+plt.scatter(LO_simulated_data_2017_filtered1["Date"], LO_simulated_data_2017_filtered1["ptclaireLevel"], 
+            s = 3, c="red", label='_nolegend_') # note the red line 
+
+# points for historic pt claire 
+plt.scatter(pointeClaire_historic_wtlvl_filtered_2016_2017["Date"], pointeClaire_historic_wtlvl_filtered_2016_2017["wt_lvl__m"], s = 15, 
+            c="k", zorder = 5)
+
+plt.ylabel("Water level (m)")
+plt.title("Pointe Claire Simulated and Observed Water Levels (2016-2017)")
+#plt.title("Red and blue lines differ by the simulation model's initial conditions (1900 or 2017)\nVertical red dashed line is the last week of May 2017, after which the Board began deviating from Plan 2014", fontsize = 7)
+plt.legend(["1900 simulated", "2017 simulated", "historic"], 
+           loc = "upper right", 
+           fontsize = 12)
+plt.xlabel('''Date (YYYY-MM)
+           
+Red and blue lines differ by the simulation model's initial conditions (1900 or 2017).\nVertical red dashed line is the last week of May 2017, after which the Board began deviating from Plan 2014.''')
+#plt.ylim(73.5, 76.0)
+# add vertical line for last week of May; after this line is when Board deviations occurred
+v_pos = dt.datetime(2017, 5, 24) # Last week of May, 2017
+plt.axvline(x = v_pos, color = "red", linestyle = "--")
+
+ptclaire_time_series_fig_2017.savefig("./figs/ptclaire_time_series_fig_2017.png", dpi = 400)
+
+# ------------------------------------------------------------------------------------------------
+# TIME SERIES ANALYSIS (2): COMPARE OBSERVED AND SIMULATED [post-2017]
+# POINTE CLAIRE COMPARISON
+# ------------------------------------------------------------------------------------------------
+
+# post-2017 Pointe Claire time series fig 
+
+# filter the pt claire historic data to post-2017
+pointeClaire_historic_wtlvl_filtered_post_2017 = pointeClaire_historic_wtlvl[pointeClaire_historic_wtlvl["YEAR"].isin([2018, 2019])]
+
+# plot pt claire post-2017 time series fig 
+ptclaire_time_series_post2017_fig = plt.figure()
+
+plt.scatter(pointeClaire_historic_wtlvl_filtered_post_2017["Date"], pointeClaire_historic_wtlvl_filtered_post_2017["wt_lvl__m"], 
+            s = 3, c="k")
+
+# just plot 1900 initialized, b/c 2017 initialized is the same into 2018
+plt.plot(LO_simulated_data_post_2017["Date"], LO_simulated_data_post_2017["ptclaireLevel"], 
+         c = "blue", linewidth = 1)
+plt.scatter(LO_simulated_data_post_2017["Date"], LO_simulated_data_post_2017["ptclaireLevel"], 
+            s = 1, c="blue", label='_nolegend_')
+
+plt.ylabel("Water level (m)")
+plt.xlabel("Date (YYYY-MM)")
+plt.xticks(fontsize = 7)
+
+ptclaire_time_series_post2017_fig.suptitle("Pointe Claire Simulated and Observed Water Levels (2018 - 2019)")
+#plt.title("Datum: IGLD 1985", loc = "left", fontsize = 10)
+#plt.ylim(73.5, 76.0)
+plt.legend(["historic", "1900 simulated"])
+
+ptclaire_time_series_post2017_fig.savefig("./figs/ptclaire_time_series_post2017_fig.png", dpi = 400)
+
+
+# compute statistics on the pt claire data pre and post-2017 (R-squared and RMSE) -> UNSUCCESSFUL
+# BECAUSE OF MISMATCHED UNIT OF OBSERVATION B/W PT CLAIRE SIMULATED AND OBSERVED DATA, 
+# SO CAN'T DIRECTLY COMPUTE THE R-SQUARED...
+
+# pre-2017
+# might need to force the LO simulated data to start at 1915 like the PT Claire data
+#ptclaire_r2_pre2017 = r2_score(pointeClaire_historic_wtlvl_pre2016["wt_lvl__m"], LO_simulated_data_pre_2017["ptclaireLevel"])
+# can't compute pt claire R-squared pre-2017 b/c the # of samples are inconsistent 
+
+# post-2017
+#ptclaire_r2_post2017 = r2_score(pointeClaire_historic_wtlvl_filtered_post_2017["wt_lvl__m"], LO_simulated_data_post_2017["ptclaireLevel"])
