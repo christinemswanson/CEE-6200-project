@@ -55,6 +55,7 @@ ogdensburg_historic_wtlvl["dates"] = ogdensburg_dates # append the new dates col
 pointeClaire_historic_wtlvl = pd.read_csv("./data/historic/cleaned/pointClaire_wtlvl_cleaned.csv")
 pointeClaire_historic_wtlvl = pointeClaire_historic_wtlvl.iloc[:, 1:9].rename(columns = {"DD":"DAY"})
 pointeClaire_historic_wtlvl["Date"] = pd.to_datetime(pointeClaire_historic_wtlvl[["YEAR", "month", "DAY"]], errors='coerce') # make date column 
+pointeClaire_historic_wtlvl = pointeClaire_historic_wtlvl.dropna(subset=['Date'])
 # errors = "coerce" to account for leap years
 
 # load simulated water levels and flows along SLR and LO from 
@@ -326,7 +327,7 @@ LO_2017_scatter_fig.savefig("./figs/LO_2017_compare_scatter_fig.png", dpi = 400)
 # USE THIS PLOT IN FINAL PROJECT!!!!!!
 # red and black lines are close, which is good!
 
-LO_historic_wtlvl_2017 = LO_historic_wtlvl[LO_historic_wtlvl["Year"].isin([2016, 2017])] # historical wt lvls for 2016 and 2017 only
+LO_historic_wtlvl_2017 = LO_historic_wtlvl[LO_historic_wtlvl["Year"].isin([2016, 2017, 2018, 2019])] # historical wt lvls for 2016-2019 only
 
 #month_to_str_hist = {
     #1: " Jan", 2: " Feb", 3:" Mar", 4:" Apr",
@@ -337,7 +338,7 @@ LO_historic_wtlvl_2017 = LO_historic_wtlvl[LO_historic_wtlvl["Year"].isin([2016,
 #LO_historic_wtlvl_2017['month2'] = LO_historic_wtlvl_2017['month'].map(month_to_str_hist)
 
 # 2017 initialization - filter to 2016 and 2017
-LO_simulated_data_2017_filtered = LO_simulated_data_2017[LO_simulated_data_2017["Year"].isin([2016, 2017])]
+LO_simulated_data_2017_filtered = LO_simulated_data_2017[LO_simulated_data_2017["Year"].isin([2016, 2017, 2018, 2019])]
 #LO_simulated_data_2017_filtered_agg = LO_simulated_data_2017_filtered.groupby(["Year", "Month"]).mean("ontLevel").reset_index()
 #LO_simulated_data_2017_filtered_agg["Date"] = pd.to_datetime(LO_simulated_data_2017_filtered_agg[["Year", "Month"]].assign(DAY=1))
 
@@ -360,7 +361,7 @@ LO_simulated_data_2017_filtered = LO_simulated_data_2017[LO_simulated_data_2017[
 
 
 # 1900 initialization - filter to 2016 and 2017
-LO_simulated_data_filtered = LO_simulated_data[LO_simulated_data["Year"].isin([2016, 2017])]
+LO_simulated_data_filtered = LO_simulated_data[LO_simulated_data["Year"].isin([2016, 2017, 2018, 2019])]
 #LO_simulated_data_filtered_agg = LO_simulated_data_filtered.groupby(["Year", "Month"]).mean("ontLevel").reset_index()
 #LO_simulated_data_filtered_agg["Date"] = pd.to_datetime(LO_simulated_data_filtered_agg[["Year", "Month"]].assign(DAY=1))
 # add a string month column
@@ -369,13 +370,14 @@ LO_simulated_data_filtered = LO_simulated_data[LO_simulated_data["Year"].isin([2
 
 # Plot LO historic, and 2 versions of simulated for 2016 and 2017 
 # all as time series on same plot 
-LO_time_series_fig = plt.figure(figsize = (12,7.5))
+LO_time_series_fig = plt.figure(figsize = (13,8.5)) # 12, 7.5
 
 # simulated water levels, initialized with 1900 conditions (removed "agg")
 # unit of obs = QM
-plt.plot(LO_simulated_data_filtered["Date"], LO_simulated_data_filtered["ontLevel"], c = "blue")
+plt.plot(LO_simulated_data_filtered["Date"], LO_simulated_data_filtered["ontLevel"], 
+         c = "grey", linestyle = "--")
 plt.scatter(LO_simulated_data_filtered["Date"], LO_simulated_data_filtered["ontLevel"], 
-            s = 3, c="blue", label='_nolegend_')
+            s = 3, c="grey", label='_nolegend_')
 
 # simulated water levels, initialized with 2017 conditions (removed "agg")
 # unit of obs = QM
@@ -393,18 +395,29 @@ plt.scatter(LO_historic_wtlvl_2017["Date"], LO_historic_wtlvl_2017["wt_lvl__m"],
             c="k", zorder = 5)
 
 plt.ylabel("Water level (m)")
-plt.title("Lake Ontario Simulated and Observed Water Levels (2016-2017)")
+plt.title("Lake Ontario Simulated and Observed Water Levels (2016-2019)")
 #plt.title("Red and blue lines differ by the simulation model's initial conditions (1900 or 2017)\nVertical red dashed line is the last week of May 2017, after which the Board began deviating from Plan 2014", fontsize = 7)
-plt.legend(["1900 simulated", "2017 simulated", "historic"], 
-           loc = "upper right", 
+plt.legend(["1900 simulated", "2017 simulated", "observed"], 
+           loc = "upper left", 
            fontsize = 12)
 plt.xlabel('''Date (YYYY-MM)
            
-Red and blue lines differ by the simulation model's initial conditions (1900 or 2017).\nVertical red dashed line is the last week of May 2017, after which the Board began deviating from Plan 2014.''')
+Red and grey lines differ by the simulation model's initial conditions (1900 or 2017).\nVertical black dashed line is the last week of May 2017, after which the Board began deviating from Plan 2014.
+The R-squared and RMSE are computed with respect to beginning of month water levels (observed) and last quarter-month (simulated) during 2018-2019.''')
 #plt.ylim(73.5, 76.0)
 # add vertical line for last week of May; after this line is when Board deviations occurred
 v_pos = dt.datetime(2017, 5, 24) # Last week of May, 2017
-plt.axvline(x = v_pos, color = "red", linestyle = "--")
+plt.axvline(x = v_pos, color = "black", linestyle = "--")
+
+# need to call "LO_simulated_data_last_QM_post2017" before running this code
+# Calculate R-squared (just based on post-2017 data)
+r2 = r2_score(LO_simulated_data_last_QM_post2017["ontLevel"], LO_historic_wtlvl_post_2017["wt_lvl__m"])
+
+# Calculate RMSE (just based on post-2017 data)
+rmse = mean_squared_error(LO_simulated_data_last_QM_post2017["ontLevel"], LO_historic_wtlvl_post_2017["wt_lvl__m"], squared=False)
+
+plt.annotate(f"R² = {r2:.3f}", (0.02, 0.8), xycoords='axes fraction')
+plt.annotate(f"RMSE = {rmse:.3f}", (0.02, 0.75), xycoords='axes fraction')
 
 LO_time_series_fig.savefig("./figs/LO_time_series_fig.png", dpi = 400)
 
@@ -417,23 +430,24 @@ LO_time_series_fig.savefig("./figs/LO_time_series_fig.png", dpi = 400)
 # make a year column in a bay full historic df - NOT RIGHT
 abay_full_historic_wtlvl["Year"] = abay_full_historic_wtlvl["date"].dt.year
 
-abay_historic_wtlvl_2017 = abay_full_historic_wtlvl[abay_full_historic_wtlvl["Year"].isin([2016, 2017])] # historical wt lvls for 2016 and 2017 only
+abay_historic_wtlvl_2017 = abay_full_historic_wtlvl[abay_full_historic_wtlvl["Year"].isin([2016, 2017, 2018, 2019])] # historical wt lvls for 2016 and 2017 only
 
 # 2017 initialization - filter A Bay data to 2016 and 2017
-LO_simulated_data_2017_filtered1 = LO_simulated_data_2017[LO_simulated_data_2017["Year"].isin([2016, 2017])]
+LO_simulated_data_2017_filtered1 = LO_simulated_data_2017[LO_simulated_data_2017["Year"].isin([2016, 2017, 2018, 2019])]
 
 # 1900 initialization - filter A Bay data to 2016 and 2017
-LO_simulated_data_filtered = LO_simulated_data[LO_simulated_data["Year"].isin([2016, 2017])]
+LO_simulated_data_filtered = LO_simulated_data[LO_simulated_data["Year"].isin([2016, 2017, 2018, 2019])]
 
 # Plot LO historic, and 2 versions of simulated for 2016 and 2017 
 # all as time series on same plot 
-abay_time_series_fig_2017 = plt.figure(figsize = (12,7.5))
+abay_time_series_fig_2017 = plt.figure(figsize = (13,8.5))
 
 # simulated water levels, initialized with 1900 conditions (removed "agg")
 # unit of obs = QM
-plt.plot(LO_simulated_data_filtered["Date"], LO_simulated_data_filtered["alexbayLevel"], c = "blue")
+plt.plot(LO_simulated_data_filtered["Date"], LO_simulated_data_filtered["alexbayLevel"], 
+         c = "grey", linestyle = "--")
 plt.scatter(LO_simulated_data_filtered["Date"], LO_simulated_data_filtered["alexbayLevel"], 
-            s = 3, c="blue", label='_nolegend_')
+            s = 3, c="grey", label='_nolegend_')
 
 # simulated water levels, initialized with 2017 conditions (removed "agg")
 # unit of obs = QM
@@ -453,18 +467,28 @@ plt.scatter(abay_historic_wtlvl_2017["date"], abay_historic_wtlvl_2017["wt_lvl__
             c="k", zorder = 5)
 
 plt.ylabel("Water level (m)")
-plt.title("Alexandria Bay Simulated and Observed Water Levels (2016-2017)")
+plt.title("Alexandria Bay Simulated and Observed Water Levels (2016-2019)")
 #plt.title("Red and blue lines differ by the simulation model's initial conditions (1900 or 2017)\nVertical red dashed line is the last week of May 2017, after which the Board began deviating from Plan 2014", fontsize = 7)
-plt.legend(["1900 simulated", "2017 simulated", "historic"], 
-           loc = "upper right", 
+plt.legend(["1900 simulated", "2017 simulated", "observed"], 
+           loc = "upper left", 
            fontsize = 12)
 plt.xlabel('''Date (YYYY-MM)
            
-Red and blue lines differ by the simulation model's initial conditions (1900 or 2017).\nVertical red dashed line is the last week of May 2017, after which the Board began deviating from Plan 2014.''')
+Red and grey lines differ by the simulation model's initial conditions (1900 or 2017).\nVertical black dashed line is the last week of May 2017, after which the Board began deviating from Plan 2014.
+The R-squared and RMSE are computed with respect to end of month water levels (observed and simulated) during 2018-2019.''')
 #plt.ylim(73.5, 76.0)
 # add vertical line for last week of May; after this line is when Board deviations occurred
 v_pos = dt.datetime(2017, 5, 24) # Last week of May, 2017
-plt.axvline(x = v_pos, color = "red", linestyle = "--")
+plt.axvline(x = v_pos, color = "black", linestyle = "--")
+
+# Calculate R-squared
+r2 = r2_score(LO_simulated_data_last_QM_post2017_abay["alexbayLevel"], abay_full_historic_wtlvl_post_2017_last["wt_lvl__m"])
+
+# Calculate RMSE
+rmse = mean_squared_error(LO_simulated_data_last_QM_post2017_abay["alexbayLevel"], abay_full_historic_wtlvl_post_2017_last["wt_lvl__m"], squared=False)
+
+plt.annotate(f"R² = {r2:.3f}", (0.02, 0.8), xycoords='axes fraction')
+plt.annotate(f"RMSE = {rmse:.3f}", (0.02, 0.75), xycoords='axes fraction')
 
 abay_time_series_fig_2017.savefig("./figs/abay_time_series_fig_2017.png", dpi = 400)
 
@@ -733,10 +757,11 @@ pointeClaire_scatter_fig.savefig("./figs/pointeClaire_compare_scatter_fig.png", 
 # of the NEXT month in the historical data (day = 1)
 
 # first, filter the LO_simulated_data to pre-2017
-LO_simulated_data_pre_2017 = LO_simulated_data[LO_simulated_data["Year"] < 2017]
+# make sure to use after 1958-DD though, which is after 1960...
+LO_simulated_data_pre_2017 = LO_simulated_data[(LO_simulated_data["Year"] < 2017) & (LO_simulated_data["Year"] > 1959)]
 
-# filter historic to pre-2017
-LO_historic_wtlvl_pre_2017 = LO_historic_wtlvl[LO_historic_wtlvl["Year"] < 2017]
+# filter historic to pre-2017 (beginning of month data)
+LO_historic_wtlvl_pre_2017 = LO_historic_wtlvl[(LO_historic_wtlvl["Year"] < 2017) & (LO_historic_wtlvl["Year"] > 1959)]
 
 # Select the last quarter month (fourth row in each group) in simulated
 LO_simulated_data_last_QM = LO_simulated_data_pre_2017["ontLevel"][3::4]
@@ -766,7 +791,7 @@ line.set_transform(transform)
 ax.add_line(line)
 
 #plt.plot([74.4, 74.6, 74.8, 75, 75.2, 75.4, 75.6, 75.8, 76], [74.4, 74.6, 74.8, 75, 75.2, 75.4, 75.6, 75.8, 76], c = "blue")
-LO_full_scatter_fig.suptitle("Lake Ontario simulated and observed beginning of month water levels (1900-2016)",
+LO_full_scatter_fig.suptitle("Lake Ontario simulated and observed beginning of month water levels (1960-2016)",
                              fontsize = 14)
 plt.title("The simulated data shown are the last quarter-month of each month (day ~ 28), whereas the historic data\nare the beginning of each month (day = 1)") 
 plt.legend(["1:1 line"], loc = "lower right")
@@ -857,7 +882,7 @@ ax.add_line(line)
 #plt.plot([74.4, 74.6, 74.8, 75, 75.2, 75.4, 75.6, 75.8, 76], [74.4, 74.6, 74.8, 75, 75.2, 75.4, 75.6, 75.8, 76], c = "blue")
 abay_full_scatter_fig.suptitle("Alexandria Bay simulated and observed beginning of month water levels (1984-2016)",
                              fontsize = 14)
-plt.title("The simulated data shown are the last quarter-month of each month (day ~ 28), whereas the historic data\nare the beginning of each month (day = 1)") 
+plt.title("The simulated data shown are the last quarter-month of each month (day ~ 28), whereas the historic data\nare the end of each month") 
 plt.legend(["1:1 line"], loc = "lower right")
 
 # Calculate R-squared
@@ -945,7 +970,7 @@ abay_full_scatter_fig_post2017.savefig("./figs/abay_full_scatter_fig_post2017.pn
 # Pointe Claire Comparison
 # ------------------------------------------------------------------------------------------------
 
-pointeClaire_historic_wtlvl = pointeClaire_historic_wtlvl.dropna()
+#pointeClaire_historic_wtlvl = pointeClaire_historic_wtlvl.dropna()
 
 # COME BACK TO THIS SECTION IF TIME!!!!!!!!!
 
@@ -1113,6 +1138,91 @@ plt.legend(["historic", "simulated"])
 
 pointeClaire_pre2017_fig.savefig("./figs/pointeClaire_pre2017_fig.png", dpi = 400)
 
+
+# ------------------------------------------------------------------------------------------------
+# MODEL DIAGNOSTIC ASSESSMENT (2): COMPARE OBSERVED AND SIMULATED [pre-2017]
+# POINTE CLAIRE COMPARISON WITH SCATTER PLOT
+# ------------------------------------------------------------------------------------------------
+
+# filter the Pointr Claire observed data to 1960-2016
+pointeClaire_historic_wtlvl_pre2017 = pointeClaire_historic_wtlvl[(pointeClaire_historic_wtlvl["YEAR"] < 2017) & (pointeClaire_historic_wtlvl["YEAR"] > 1959)]
+
+# Extract the last day of each month from pointeClaire_historic_wtlvl_pre2017
+
+# Get the last day of each month
+end_month_dates = []
+for date in pointeClaire_historic_wtlvl_pre2017['Date']:
+    year, month = date.year, date.month
+    print(year, month)
+    day = monthrange(year, month)[1]
+    end_month_dates.append(pd.Timestamp(year, month, day))
+
+# Filter rows for the last day of each month
+pointeClaire_historic_wtlvl_pre2017_last = pointeClaire_historic_wtlvl_pre2017[pointeClaire_historic_wtlvl_pre2017['Date'].isin(end_month_dates)].reset_index()
+
+# CHANGE HERE
+# filter LO simulated data frame for last QM to 1960 - 2016
+# first, filter the LO_simulated_data to pre-2017 for Pt Claire
+LO_simulated_data_1960_2016_ptclaire = LO_simulated_data[(LO_simulated_data["Year"] < 2017) & (LO_simulated_data["Year"] > 1959)]
+
+# Select the last quarter month (fourth row in each group) in simulated
+LO_simulated_data_1960_2016_ptclaire_last = LO_simulated_data_1960_2016_ptclaire["ptclaireLevel"][3::4]
+
+# drop the missing dates found in A Bay df (indices 4127, 4719, 4911)
+#LO_simulated_data_last_QM_1984_2016 = LO_simulated_data_last_QM_1984_2016.drop(labels = [4127, 4719, 4911])
+
+# Reset the index
+LO_simulated_data_1960_2016_ptclaire_last = LO_simulated_data_1960_2016_ptclaire_last.reset_index(drop=True)
+
+# Convert to df
+LO_simulated_data_1960_2016_ptclaire_last = pd.DataFrame(LO_simulated_data_1960_2016_ptclaire_last)
+
+# plot
+ptclaire_full_scatter_fig, ax = plt.subplots(figsize = (10,7))
+plt.scatter(LO_simulated_data_1960_2016_ptclaire_last["ptclaireLevel"], pointeClaire_historic_wtlvl_pre2017_last["wt_lvl__m"], 
+            color = "k", label='_nolegend_', s = 4)
+plt.xlabel("Simulated water level (m)")
+
+plt.ylabel("Observed water level (m)")
+#plt.xlim(73.5, 76)
+#plt.ylim(73.5, 76)
+
+# add 1:1 line 
+line = mlines.Line2D([0, 1], [0, 1], color='red')
+transform = ax.transAxes
+line.set_transform(transform)
+ax.add_line(line)
+
+#plt.plot([74.4, 74.6, 74.8, 75, 75.2, 75.4, 75.6, 75.8, 76], [74.4, 74.6, 74.8, 75, 75.2, 75.4, 75.6, 75.8, 76], c = "blue")
+ptclaire_full_scatter_fig.suptitle("Pointe Claire simulated and observed end of month water levels (1960-2016)",
+                             fontsize = 14)
+plt.title("The simulated data shown are the last quarter-month of each month (day ~ 28), whereas the historic data\nare the end of each month") 
+plt.legend(["1:1 line"], loc = "lower right")
+
+# Calculate R-squared
+# first, remove selected indices from the pt claire historic data frame
+# to compute R-squared and RMSE
+
+pointeClaire_historic_wtlvl_pre2017_last_filtered = pointeClaire_historic_wtlvl_pre2017_last.drop(labels = [31, 32, 33, 34, 35,
+                                                                                                            36, 37, 38, 39, 40,
+                                                                                                            270, 297, 363, 370,
+                                                                                                            374, 439, 441, 447, 460, 561])
+
+LO_simulated_data_1960_2016_ptclaire_last_filtered = LO_simulated_data_1960_2016_ptclaire_last.drop(labels = [31, 32, 33, 34, 35,
+                                                                                                            36, 37, 38, 39, 40,
+                                                                                                            270, 297, 363, 370,
+                                                                                                            374, 439, 441, 447, 460, 561])
+
+r2 = r2_score(LO_simulated_data_1960_2016_ptclaire_last_filtered["ptclaireLevel"], pointeClaire_historic_wtlvl_pre2017_last_filtered["wt_lvl__m"])
+
+# Calculate RMSE
+rmse = mean_squared_error(LO_simulated_data_1960_2016_ptclaire_last_filtered["ptclaireLevel"], pointeClaire_historic_wtlvl_pre2017_last_filtered["wt_lvl__m"], squared=False)
+
+plt.annotate(f"R² = {r2:.3f}", (0.1, 0.9), xycoords='axes fraction')
+plt.annotate(f"RMSE = {rmse:.3f}", (0.1, 0.85), xycoords='axes fraction')
+
+ptclaire_full_scatter_fig.savefig("./figs/ptclaire_full_scatter_fig.png", dpi = 400)
+
 # ------------------------------------------------------------------------------------------------
 # TIME SERIES ANALYSIS (2): COMPARE OBSERVED AND SIMULATED [during 2016 and 2017]
 # POINTE CLAIRE COMPARISON
@@ -1120,14 +1230,15 @@ pointeClaire_pre2017_fig.savefig("./figs/pointeClaire_pre2017_fig.png", dpi = 40
 
 # first, filter the Pointe Claire historical water levels to 2016 - 2017 
 
-pointeClaire_historic_wtlvl_filtered_2016_2017 = pointeClaire_historic_wtlvl[pointeClaire_historic_wtlvl["YEAR"].isin([2016, 2017])]
+pointeClaire_historic_wtlvl_filtered_2016_2017 = pointeClaire_historic_wtlvl[pointeClaire_historic_wtlvl["YEAR"].isin([2016, 2017, 2018, 2019])]
 
 # plot
-ptclaire_time_series_fig_2017 = plt.figure(figsize = (12,7.5))
+ptclaire_time_series_fig_2017 = plt.figure(figsize = (13,8.5))
 # 1900 initialized simulated data at pt claire 
-plt.plot(LO_simulated_data_filtered["Date"], LO_simulated_data_filtered["ptclaireLevel"], c = "blue")
+plt.plot(LO_simulated_data_filtered["Date"], LO_simulated_data_filtered["ptclaireLevel"], 
+         c = "grey", linestyle = "--")
 plt.scatter(LO_simulated_data_filtered["Date"], LO_simulated_data_filtered["ptclaireLevel"], 
-            s = 3, c="blue", label='_nolegend_')
+            s = 3, c="grey", label='_nolegend_', linestyle = "--")
 
 # 2016 initialized data at pt claire 
 plt.plot(LO_simulated_data_2017_filtered1["Date"], LO_simulated_data_2017_filtered1["ptclaireLevel"], c = "red")
@@ -1141,16 +1252,21 @@ plt.scatter(pointeClaire_historic_wtlvl_filtered_2016_2017["Date"], pointeClaire
 plt.ylabel("Water level (m)")
 plt.title("Pointe Claire Simulated and Observed Water Levels (2016-2017)")
 #plt.title("Red and blue lines differ by the simulation model's initial conditions (1900 or 2017)\nVertical red dashed line is the last week of May 2017, after which the Board began deviating from Plan 2014", fontsize = 7)
-plt.legend(["1900 simulated", "2017 simulated", "historic"], 
-           loc = "upper right", 
-           fontsize = 12)
+plt.legend(["1900 simulated", "2017 simulated", "observed"], 
+           loc = "lower right", 
+           fontsize = 13)
 plt.xlabel('''Date (YYYY-MM)
            
-Red and blue lines differ by the simulation model's initial conditions (1900 or 2017).\nVertical red dashed line is the last week of May 2017, after which the Board began deviating from Plan 2014.''')
+Red and grey lines differ by the simulation model's initial conditions (1900 or 2017).\nVertical black dashed line is the last week of May 2017, after which the Board began deviating from Plan 2014.
+The R-squared and RMSE are computed with respect to the end of month water levels (observed and simulated) from 2018 to 2019.''')
 #plt.ylim(73.5, 76.0)
 # add vertical line for last week of May; after this line is when Board deviations occurred
 v_pos = dt.datetime(2017, 5, 24) # Last week of May, 2017
-plt.axvline(x = v_pos, color = "red", linestyle = "--")
+plt.axvline(x = v_pos, color = "black", linestyle = "--")
+
+
+plt.annotate(f"R² = {ptclaire_r2_post2017:.3f}", (0.05, 0.95), xycoords='axes fraction')
+plt.annotate(f"RMSE = {ptclaire_rmse_post2017:.3f}", (0.05, 0.9), xycoords='axes fraction')
 
 ptclaire_time_series_fig_2017.savefig("./figs/ptclaire_time_series_fig_2017.png", dpi = 400)
 
@@ -1172,9 +1288,14 @@ plt.scatter(pointeClaire_historic_wtlvl_filtered_post_2017["Date"], pointeClaire
 
 # just plot 1900 initialized, b/c 2017 initialized is the same into 2018
 plt.plot(LO_simulated_data_post_2017["Date"], LO_simulated_data_post_2017["ptclaireLevel"], 
-         c = "blue", linewidth = 1)
+         c = "grey", linewidth = 1, linestyle = "--")
 plt.scatter(LO_simulated_data_post_2017["Date"], LO_simulated_data_post_2017["ptclaireLevel"], 
-            s = 1, c="blue", label='_nolegend_')
+            s = 1, c="grey", label='_nolegend_')
+
+plt.plot(LO_simulated_data_2017_post2017["Date"], LO_simulated_data_2017_post2017["ptclaireLevel"], 
+         c = "red", linewidth = 1)
+plt.scatter(LO_simulated_data_2017_post2017["Date"], LO_simulated_data_2017_post2017["ptclaireLevel"], 
+            s = 1, c="red", label='_nolegend_')
 
 plt.ylabel("Water level (m)")
 plt.xlabel("Date (YYYY-MM)")
@@ -1183,7 +1304,8 @@ plt.xticks(fontsize = 7)
 ptclaire_time_series_post2017_fig.suptitle("Pointe Claire Simulated and Observed Water Levels (2018 - 2019)")
 #plt.title("Datum: IGLD 1985", loc = "left", fontsize = 10)
 #plt.ylim(73.5, 76.0)
-plt.legend(["historic", "1900 simulated"])
+plt.legend(["historic", "1900 simulated", "2017 simulated"],
+           loc = "upper right", fontsize = 7)
 
 ptclaire_time_series_post2017_fig.savefig("./figs/ptclaire_time_series_post2017_fig.png", dpi = 400)
 
@@ -1197,5 +1319,37 @@ ptclaire_time_series_post2017_fig.savefig("./figs/ptclaire_time_series_post2017_
 #ptclaire_r2_pre2017 = r2_score(pointeClaire_historic_wtlvl_pre2016["wt_lvl__m"], LO_simulated_data_pre_2017["ptclaireLevel"])
 # can't compute pt claire R-squared pre-2017 b/c the # of samples are inconsistent 
 
+
+
 # post-2017
-#ptclaire_r2_post2017 = r2_score(pointeClaire_historic_wtlvl_filtered_post_2017["wt_lvl__m"], LO_simulated_data_post_2017["ptclaireLevel"])
+# Extract the last day of each month from pointeClaire_historic_wtlvl_pre2017
+
+# Get the last day of each month
+end_month_dates = []
+for date in pointeClaire_historic_wtlvl_filtered_post_2017['Date']:
+    year, month = date.year, date.month
+    print(year, month)
+    day = monthrange(year, month)[1]
+    end_month_dates.append(pd.Timestamp(year, month, day))
+
+# Filter rows for the last day of each month
+pointeClaire_historic_wtlvl_post2017_last = pointeClaire_historic_wtlvl_filtered_2016_2017[pointeClaire_historic_wtlvl_filtered_2016_2017['Date'].isin(end_month_dates)].reset_index()
+
+
+
+LO_simulated_data_post2017_ptclaire = LO_simulated_data[(LO_simulated_data["Year"] > 2017) & (LO_simulated_data["Year"] < 2020)]
+
+# Select the last quarter month (fourth row in each group) in simulated
+LO_simulated_data_post2017_ptclaire_last = LO_simulated_data_post2017_ptclaire["ptclaireLevel"][3::4]
+
+# drop the missing dates found in A Bay df (indices 4127, 4719, 4911)
+#LO_simulated_data_last_QM_1984_2016 = LO_simulated_data_last_QM_1984_2016.drop(labels = [4127, 4719, 4911])
+
+# Reset the index
+LO_simulated_data_post2017_ptclaire_last = LO_simulated_data_post2017_ptclaire_last.reset_index(drop=True)
+
+# Convert to df
+LO_simulated_data_post2017_ptclaire_last = pd.DataFrame(LO_simulated_data_post2017_ptclaire_last)
+
+ptclaire_r2_post2017 = r2_score(pointeClaire_historic_wtlvl_post2017_last["wt_lvl__m"], LO_simulated_data_post2017_ptclaire_last["ptclaireLevel"])
+ptclaire_rmse_post2017 = mean_squared_error(pointeClaire_historic_wtlvl_post2017_last["wt_lvl__m"], LO_simulated_data_post2017_ptclaire_last["ptclaireLevel"], squared = False)
