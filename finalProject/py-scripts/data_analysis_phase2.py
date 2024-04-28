@@ -136,9 +136,10 @@ LO_simulated_s1_fig = plt.figure()
 plt.plot(LO_simulated_data_s1["Date"], LO_simulated_data_s1["ontLevel"], c = "k")
 
 plt.ylabel("Simulated water level (m)")
+plt.xlabel("Year")
 LO_simulated_s1_fig.suptitle("Lake Ontario Simulated Quarter-Monthly Water Levels Under Climate Change (2022 - 2090)",
                              fontsize = 8)
-plt.title("Scenario: ssp245_AWI-CM-1-1-MR", fontsize = 8)
+plt.title("Emission Scenario: SSP2-4.5, GCM: AWI-CM-1-1-MR", fontsize = 8)
 
 #plt.ylim(73.5, 76.0)
 
@@ -151,9 +152,10 @@ LO_simulated_s2_fig = plt.figure()
 plt.plot(LO_simulated_data_s2["Date"], LO_simulated_data_s2["ontLevel"], c = "k")
 
 plt.ylabel("Simulated water level (m)")
+plt.xlabel("Year")
 LO_simulated_s2_fig.suptitle("Lake Ontario Simulated Quarter-Monthly Water Levels Under Climate Change (2022 - 2090)",
                              fontsize = 8)
-plt.title("Scenario: ssp585_MRI-ESM2-0", fontsize = 8)
+plt.title("Emission Scenario: SSP5-8.5, GCM: MRI-ESM2-0", fontsize = 8)
 
 #plt.ylim(73.5, 76.0)
 
@@ -166,9 +168,10 @@ LO_simulated_s3_fig = plt.figure()
 plt.plot(LO_simulated_data_s3["Date"], LO_simulated_data_s3["ontLevel"], c = "k")
 
 plt.ylabel("Simulated water level (m)")
+plt.xlabel("Year")
 LO_simulated_s3_fig.suptitle("Lake Ontario Simulated Quarter-Monthly Water Levels Under Climate Change (2022 - 2090)",
                              fontsize = 8)
-plt.title("Scenario: ssp585_UKESM1-0-LL", fontsize = 8)
+plt.title("Emission Scenario: SSP5-8.5, GCM: UKESM1-0-LL", fontsize = 8)
 
 #plt.ylim(73.5, 76.0)
 
@@ -189,8 +192,9 @@ plt.plot(exceedance_df_s1['exceed'], exceedance_df_s1['ontLevel'],
          linewidth=2, color = "k")
 #plt.xscale('linear')  # Linear scale for x-axis (default)
 #plt.yscale('log')     # Log scale for y-axis
-plt.title('Water Level Exceedance Curve for Lake Ontario Under Climate Change Scenario SSP 245 AWI (2022-2090)',
-          fontsize = 10)
+LO_simulated_s1_exceedance_fig.suptitle('Water Level Exceedance Curve for Lake Ontario Under Climate Change (2022-2090)',
+          fontsize = 12)
+plt.title("Emission Scenario: SSP2-4.5, GCM: AWI-CM-1-1-MR")
 plt.xlabel('% Exceedance')
 plt.ylabel('Simulated Water Level (m)')
 plt.grid(True)
@@ -219,8 +223,9 @@ plt.plot(exceedance_df_s2['exceed'], exceedance_df_s2['ontLevel'],
          linewidth=2, color = "k")
 #plt.xscale('linear')  # Linear scale for x-axis (default)
 #plt.yscale('log')     # Log scale for y-axis
-plt.title('Water Level Exceedance Curve for Lake Ontario Under Climate Change Scenario SSP 585 MRI (2022-2090)',
-          fontsize = 10)
+LO_simulated_s2_exceedance_fig.suptitle('Water Level Exceedance Curve for Lake Ontario Under Climate Change (2022-2090)',
+          fontsize = 12)
+plt.title("Emission Scenario: SSP5-8.5, GCM: MRI-ESM2-0")
 plt.xlabel('% Exceedance')
 plt.ylabel('Simulated Water Level (m)')
 plt.grid(True)
@@ -248,8 +253,9 @@ plt.plot(exceedance_df_s3['exceed'], exceedance_df_s3['ontLevel'],
          linewidth=2, color = "k")
 #plt.xscale('linear')  # Linear scale for x-axis (default)
 #plt.yscale('log')     # Log scale for y-axis
-plt.title('Water Level Exceedance Curve for Lake Ontario Under Climate Change Scenario SSP 585 UKESM1 (2022-2090)',
-          fontsize = 10)
+LO_simulated_s3_exceedance_fig.suptitle('Water Level Exceedance Curve for Lake Ontario Under Climate Change (2022-2090)',
+          fontsize = 12)
+plt.title("Emission Scenario: SSP5-8.5, GCM: UKESM1-0-LL")
 plt.xlabel('% Exceedance')
 plt.ylabel('Simulated Water Level (m)')
 plt.grid(True)
