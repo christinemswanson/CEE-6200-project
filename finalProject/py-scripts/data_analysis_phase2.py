@@ -208,6 +208,7 @@ plt.axhline(y=75.5, color='red', linestyle='--')
 # the red line at 75.5 m indicates when flooding typically 
 # start on LO
 #plt.axvline(x=exceedance_75_5, color='red', linestyle='--')
+plt.ylim(73.5, 76.5)
 
 LO_simulated_s1_exceedance_fig.savefig("./figs/LO_simulated_s1_exceedance_fig.png", dpi = 400)
 
@@ -239,6 +240,7 @@ plt.axhline(y=75.5, color='red', linestyle='--')
 # the red line at 75.5 m indicates when flooding typically 
 # start on LO
 #plt.axvline(x=exceedance_75_5, color='red', linestyle='--')
+plt.ylim(73.5, 76.5)
 
 LO_simulated_s2_exceedance_fig.savefig("./figs/LO_simulated_s2_exceedance_fig.png", dpi = 400)
 
@@ -269,6 +271,7 @@ plt.axhline(y=75.5, color='red', linestyle='--')
 # the red line at 75.5 m indicates when flooding typically 
 # start on LO
 #plt.axvline(x=exceedance_75_5, color='red', linestyle='--')
+plt.ylim(73.5, 76.5)
 
 LO_simulated_s3_exceedance_fig.savefig("./figs/LO_simulated_s3_exceedance_fig.png", dpi = 400)
 
@@ -301,6 +304,7 @@ plt.axhline(y=75.5, color='red', linestyle='--')
 # the red line at 75.5 m indicates when flooding typically 
 # start on LO
 #plt.axvline(x=exceedance_75_5, color='red', linestyle='--')
+plt.ylim(73.5, 76.5)
 
 LO_historic_exceedance_fig.savefig("./figs/LO_historic_exceedance_fig.png", dpi = 400)
 
@@ -332,6 +336,7 @@ plt.axhline(y=75.5, color='red', linestyle='--')
 # the red line at 75.5 m indicates when flooding typically 
 # start on LO
 #plt.axvline(x=exceedance_75_5, color='red', linestyle='--')
+plt.ylim(73.5, 76.5)
 
 LO_simulated_data_exceedance_fig.savefig("./figs/LO_simulated_data_exceedance_fig.png", dpi = 400)
 # note I needed to drop the year 2020 because I accidentally didn't simulate for this year!
