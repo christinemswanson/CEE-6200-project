@@ -276,6 +276,51 @@ plt.ylim(73.5, 76.5)
 LO_simulated_s3_exceedance_fig.savefig("./figs/LO_simulated_s3_exceedance_fig.png", dpi = 400)
 
 # ------------------------------------------------------------------------------------------------
+# STEP 1.2: COMBINE THE CC SIMULATED DATA -> water level exceedance curves
+# into one plot for easier comparison
+# ------------------------------------------------------------------------------------------------
+
+# Plot the combined exceedance curves for the 3 CC scenarios 
+LO_simulated_combined_exceedance_fig = plt.figure(figsize=(8.5, 6))
+
+# scenario 1
+plt.plot(exceedance_df_s1['exceed'], exceedance_df_s1['ontLevel'], 
+         linewidth=2, color = "k")
+
+# scenario 2
+plt.plot(exceedance_df_s2['exceed'], exceedance_df_s2['ontLevel'], 
+         linewidth=2, color = "blue")
+
+# scenario 3
+plt.plot(exceedance_df_s3['exceed'], exceedance_df_s3['ontLevel'], 
+         linewidth=2, color = "orange")
+
+#plt.xscale('linear')  # Linear scale for x-axis (default)
+#plt.yscale('log')     # Log scale for y-axis
+LO_simulated_combined_exceedance_fig.suptitle('Water Level Exceedance Curves for Lake Ontario Under 3 Climate Change Scenarios (2022-2090)',
+          fontsize = 12)
+#plt.title("Emission Scenario: SSP5-8.5, GCM: UKESM1-0-LL")
+plt.xlabel('% Exceedance') 
+plt.ylabel('Simulated Water Level (m)')
+plt.grid(True)
+plt.xticks(np.linspace(0, 1, 11))  # Set x-axis tick marks
+#plt.gca().invert_xaxis()  # Invert x-axis for exceedance percentage
+#plt.gca().yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: '{:.0f}'.format(x)))  # Format y-axis labels
+plt.gca().xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: '{:.0%}'.format(x)))  # Format x-axis labels
+
+#exceedance_75_5 = exceedance_df_s1.loc[exceedance_df_s1['ontLevel'] >= 75.5, 'exceed'].min()
+plt.axhline(y=75.5, color='red', linestyle='--')
+# the red line at 75.5 m indicates when flooding typically 
+# start on LO
+#plt.axvline(x=exceedance_75_5, color='red', linestyle='--')
+plt.ylim(73.5, 76.5)
+plt.legend(["Scenario 1", "Scenario 2", "Scenario 3"])
+
+LO_simulated_combined_exceedance_fig.savefig("./figs/LO_simulated_combined_exceedance_fig.png", dpi = 400)
+# will need to describe what the three scenarios are in the figure caption 
+# they correspond to the AWI, MRI, and UKE GCMs, respectively 
+
+# ------------------------------------------------------------------------------------------------
 # STEP 2: COMPARE TO WATER LEVEL EXCEEDANCE CURVE FOR HISTORIC LO LEVELS
 # ------------------------------------------------------------------------------------------------
 
